@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F2042">
+<title>Wedding CMS · Bulk Invitation Studio</title>
+<!-- Tailwind build of admin/tailwind.css (npm run build:admin-css) -->
+<link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body class="min-h-dvh">
+<header class="sticky top-0 z-50 bg-navy text-ivory shadow-md" style="padding-top:env(safe-area-inset-top)">
+  <div class="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
+    <h1 class="m-0 flex-1 truncate font-serif text-lg font-semibold sm:text-xl">Wedding CMS</h1>
+    <a class="btn btn-sm bg-white/10 text-ivory hover:bg-white/20" href="/site/" target="_blank" rel="noopener">Xem web ↗</a>
+    <button id="build" class="btn btn-sm btn-primary" type="button">Build lại</button>
+  </div>
+  <nav class="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-3 pb-2 text-sm [scrollbar-width:none]" aria-label="Mục quản lý">
+    <a class="shrink-0 rounded-full px-3 py-1.5 text-ivory/80 no-underline hover:bg-white/10 hover:text-white" href="#config-section">Nội dung</a>
+    <a class="shrink-0 rounded-full px-3 py-1.5 text-ivory/80 no-underline hover:bg-white/10 hover:text-white" href="#photos-section">Ảnh cưới</a>
+    <a class="shrink-0 rounded-full px-3 py-1.5 text-ivory/80 no-underline hover:bg-white/10 hover:text-white" href="#seating-section">Sơ đồ bàn</a>
+    <a class="shrink-0 rounded-full px-3 py-1.5 text-ivory/80 no-underline hover:bg-white/10 hover:text-white" href="#bulk-section">Thiệp mời</a>
+  </nav>
+</header>
+<p id="build-status" class="status mx-auto max-w-6xl px-4 pt-2 empty:hidden"></p>
+<main class="mx-auto grid max-w-6xl gap-4 px-3 py-4 sm:gap-6 sm:px-4 sm:py-6" style="padding-bottom:max(1.5rem, env(safe-area-inset-bottom))">
+  <!-- Each section is owned by one module in src/backend/admin/ -->
+  <section id="config-section" class="card scroll-mt-28">
+    <h2 class="card-title">Nội dung &amp; sự kiện</h2>
+    <div id="config-root"></div>
+    <p id="config-status" class="status mt-2"></p>
+  </section>
+
+  <section id="photos-section" class="card scroll-mt-28">
+    <h2 class="card-title">Ảnh cưới</h2>
+    <div id="photos-root"></div>
+  </section>
+
+  <section id="seating-section" class="card scroll-mt-28">
+    <h2 class="card-title">Sơ đồ bàn tiệc</h2>
+    <div id="seating-root"></div>
+  </section>
+
+  <section id="bulk-section" class="card scroll-mt-28">
+    <h2 class="card-title">Bulk Invitation Studio</h2>
+    <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+      <button id="process" class="btn btn-primary" type="button">Đồng bộ Google Sheet &amp; tạo thiệp JPG</button>
+      <button id="email" class="btn btn-secondary" type="button">Gửi email hàng loạt</button>
+      <span id="bulk-status" class="status"></span>
+    </div>
+    <!-- Rendered by loadGuests(): table on desktop, stacked cards on phones -->
+    <div id="guests" class="mt-4 grid gap-3"></div>
+  </section>
+</main>
+<script type="module">
+import { $, api, busy, esc } from '/admin/common.js';
+import * as configForm from '/admin/config-form.js';
+import * as photos from '/admin/photos.js';
+import * as seating from '/admin/seating-editor.js';
+
+const STATUS_CLASS = { GENERATED: 'bg-sky-100 text-sky-800', SENT: 'bg-green-100 text-green-800', PENDING: 'bg-pink-100 text-pink-800' };
+async function loadGuests() {
+  const guests = await api('GET', '/api/bulk/guests');
+  if (!guests.length) { $('guests').innerHTML = '<p class="status">Chưa có khách — bấm “Đồng bộ Google Sheet”.</p>'; return; }
+  $('guests').innerHTML = guests.map((g, i) => `
+    <article class="flex gap-3 rounded-xl border border-line bg-white p-3">
+      ${g.cardUrl ? `<a class="shrink-0" href="${esc(g.cardUrl)}" target="_blank"><img class="w-16 rounded-md sm:w-20" src="${esc(g.cardUrl)}" alt=""></a>` : '<div class="grid h-24 w-16 shrink-0 place-items-center rounded-md bg-cream text-xs text-muted sm:w-20">Chưa có</div>'}
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-wrap items-center gap-2">
+          <strong class="text-navy">${esc(g.name)}</strong>
+          <span class="badge ${STATUS_CLASS[g.status] ?? ''}">${esc(g.status)}</span>
+          <span class="badge">${g.count} chỗ</span>
+        </div>
+        <p class="m-0 text-xs text-muted">${esc(g.salutation)} · ${esc(g.relationship)}${g.phone ? ' · ' + esc(g.phone) : ''}${g.email ? ' · ' + esc(g.email) : ''}</p>
+        <a class="block truncate text-xs text-burgundy" href="${esc(g.assist.inviteUrl)}" target="_blank">${esc(g.assist.inviteUrl)}</a>
+        <div class="mt-2 flex flex-wrap gap-1.5">
+          <button class="btn btn-sm btn-primary" type="button" data-i="${i}" data-act="copy-img" ${g.cardUrl ? '' : 'disabled'}>Copy ảnh</button>
+          <button class="btn btn-sm btn-outline" type="button" data-i="${i}" data-act="copy-text">Copy lời mời</button>
+          ${g.assist.zaloUrl ? `<a class="btn btn-sm btn-secondary" href="${esc(g.assist.zaloUrl)}" target="_blank" rel="noopener">Zalo</a>` : ''}
+          <a class="btn btn-sm btn-outline" href="${esc(g.assist.messengerUrl)}">Messenger</a>
+        </div>
+      </div>
+    </article>`).join('');
+  $('guests').onclick = async (ev) => {
+    const btn = ev.target.closest('button'); if (!btn) return;
+    const g = guests[Number(btn.dataset.i)];
+    try {
+      if (btn.dataset.act === 'copy-text') await navigator.clipboard.writeText(g.assist.clipboardText);
+      if (btn.dataset.act === 'copy-img') {
+        const img = await createImageBitmap(await (await fetch(g.cardUrl)).blob());
+        const c = Object.assign(document.createElement('canvas'), { width: img.width, height: img.height });
+        c.getContext('2d').drawImage(img, 0, 0);
+        const png = await new Promise((r) => c.toBlob(r, 'image/png'));
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]);
+      }
+      btn.textContent = '✓ Đã copy';
+    } catch (e) { btn.textContent = 'Lỗi copy'; }
+  };
+}
+
+$('build').onclick = (e) => busy(e.target, $('build-status'), async () => `Build xong trong ${(await api('POST', '/api/build')).durationMs.toFixed(0)}ms`);
+$('process').onclick = (e) => busy(e.target, $('bulk-status'), async () => {
+  const r = await api('POST', '/api/bulk/process');
+  await loadGuests();
+  return `Đồng bộ ${r.synced} khách · tạo ${r.generated} thiệp · ghi lại ${r.writtenBack} dòng` + (r.skipped.length ? `\nBỏ qua: ${r.skipped.map((s) => `#${s.rowId} (${s.reason})`).join(', ')}` : '');
+});
+$('email').onclick = (e) => busy(e.target, $('bulk-status'), async () => {
+  const r = await api('POST', '/api/bulk/email');
+  await loadGuests();
+  return `Đã gửi ${r.sent} email` + (r.failed.length ? ` · lỗi ${r.failed.length}` : '');
+});
+
+for (const [name, m] of Object.entries({ configForm, photos, seating })) m.init().catch((e) => console.error(`[admin] ${name} failed`, e));
+loadGuests().catch(() => {});
+</script>
+</body>
+</html>

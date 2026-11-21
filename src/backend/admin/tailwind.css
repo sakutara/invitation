@@ -1,0 +1,72 @@
+/*
+ * Admin UI styles. Source for admin.css (generated — run `npm run build:admin-css`).
+ * Tailwind v4 scans admin.html and every admin/*.js module for class names, so only use
+ * complete, literal class strings in JS (no string concatenation like `bg-${color}`).
+ */
+@import "tailwindcss";
+@source "./";
+@source "../admin.html";
+
+@theme {
+  --color-navy: #0f2042;
+  --color-navy-deep: #091326;
+  --color-burgundy: #7a1c24;
+  --color-burgundy-light: #9e2a35;
+  --color-ivory: #fdfbf7;
+  --color-cream: #f5efe6;
+  --color-line: #e5dccd;
+  --color-ink: #111827;
+  --color-muted: #4b5563;
+  --color-sky: #38bdf8;
+  --color-lotus: #ec4899;
+  --font-sans: -apple-system, "Be Vietnam Pro", "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body { @apply bg-cream text-ink font-sans text-[15px] leading-relaxed antialiased; }
+  button { cursor: pointer; }
+  button:disabled { @apply opacity-50 cursor-progress; }
+  body.modal-open { overflow: hidden; }
+}
+
+@layer components {
+  /* Buttons: .btn + one variant. Min 40px tall for touch. */
+  .btn { @apply inline-flex items-center justify-center gap-1.5 min-h-10 rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap no-underline select-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy; }
+  .btn-primary { @apply bg-burgundy text-white hover:bg-burgundy-light; }
+  .btn-secondary { @apply bg-navy text-white hover:bg-navy-deep; }
+  .btn-outline { @apply bg-white text-navy ring-1 ring-inset ring-navy/30 hover:bg-cream; }
+  .btn-danger { @apply bg-white text-red-700 ring-1 ring-inset ring-red-300 hover:bg-red-50; }
+  .btn-sm { @apply min-h-8 px-3 py-1 text-xs; }
+  .btn-icon { @apply min-h-10 min-w-10 px-0; }
+  .btn[aria-pressed="true"] { @apply bg-navy text-white ring-0; }
+
+  /* Cards & sections */
+  .card { @apply rounded-2xl border border-line bg-ivory p-4 shadow-sm sm:p-6; }
+  .card-title { @apply mb-4 font-serif text-xl font-semibold text-navy; }
+
+  /* Forms */
+  .fieldset { @apply mb-4 rounded-xl border border-line bg-white px-4 pt-2 pb-4; }
+  .legend { @apply px-1.5 font-serif text-base font-semibold text-burgundy; }
+  .field { @apply grid gap-1 py-1.5; }
+  .label { @apply text-[13px] font-semibold text-navy; }
+  .hint { @apply text-xs text-muted; }
+  .input { @apply w-full min-h-10 rounded-lg border border-[#d6ccb9] bg-white px-3 py-2 text-base sm:text-sm text-ink placeholder:text-gray-400 focus:border-burgundy focus:ring-2 focus:ring-burgundy/20 focus:outline-none; }
+  .input[aria-invalid="true"] { @apply border-red-500 ring-2 ring-red-200; }
+  textarea.input { @apply min-h-24; }
+  .status { @apply text-[13px] text-muted whitespace-pre-wrap; }
+
+  .badge { @apply inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700; }
+
+  /* Modal (common.js openModal): full screen on phones, centered dialog from sm: */
+  .modal-backdrop { @apply fixed inset-0 z-[1000] flex items-stretch justify-center bg-navy-deep/60 sm:items-center sm:p-4; }
+  .modal { @apply flex w-full flex-col bg-ivory shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:max-w-2xl sm:rounded-2xl; height: 100dvh; }
+  @media (min-width: 40rem) { .modal { height: auto; } }
+  .modal--wide { @apply sm:max-w-7xl; }
+  @media (min-width: 40rem) { .modal--wide { height: calc(100dvh - 2rem); } }
+  .modal__head { @apply flex items-center gap-3 border-b border-line px-4 py-3; padding-top: max(0.75rem, env(safe-area-inset-top)); }
+  .modal__head h3 { @apply m-0 flex-1 truncate font-serif text-lg font-semibold text-navy; }
+  .modal__body { @apply min-h-0 flex-1 overflow-auto p-3 sm:p-4; }
+  .modal__actions { @apply flex flex-wrap justify-end gap-2 border-t border-line px-4 py-3; padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+}

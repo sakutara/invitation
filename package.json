@@ -1,0 +1,40 @@
+{
+  "name": "wedding-webapp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Vietnamese wedding webapp: local CMS + SQLite + auto static builder",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit",
+    "dev": "npm run build:admin-css && tsx src/backend/server.ts",
+    "dev:lan": "npm run build:admin-css && HOST=0.0.0.0 tsx src/backend/server.ts",
+    "build": "tsx scripts/build.ts",
+    "deploy": "bash scripts/deploy.sh",
+    "build:admin-css": "tailwindcss -i src/backend/admin/tailwind.css -o src/backend/admin/admin.css --minify"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@tailwindcss/cli": "^4.3.5",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^26.6.6",
+    "@types/nodemailer": "^8.0.2",
+    "@types/qrcode": "^1.5.6",
+    "esbuild": "^0.28.2",
+    "jsdom": "^31.0.1",
+    "tailwindcss": "^4.3.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  },
+  "dependencies": {
+    "nodemailer": "^10.5.0",
+    "qrcode": "^1.5.4",
+    "sharp": "^0.35.5"
+  }
+}
