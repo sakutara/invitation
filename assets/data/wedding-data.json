@@ -1,0 +1,536 @@
+{
+  "config": {
+    "groomName": "Hoàng Trung",
+    "brideName": "Bảo Châu",
+    "groomParents": {
+      "father": "Ông Lê Văn Chính",
+      "mother": "Bà Trương Thị Thanh Chi",
+      "address": "Thống Nhất, Tp. Đồng Nai"
+    },
+    "brideParents": {
+      "father": "Ông Hồ Quang Chính",
+      "mother": "Bà Đặng Thị Thuận An",
+      "address": "Thuận Hóa, Tp. Huế"
+    },
+    "headline": "Trân trọng báo tin lễ thành hôn",
+    "story": "Từ những ngày đầu gặp gỡ đến hôm nay, chúng mình đã cùng nhau đi qua thật nhiều kỷ niệm. Và giờ đây, chúng mình muốn được cùng gia đình và bạn bè chia sẻ khoảnh khắc trọng đại nhất.",
+    "ceremony": {
+      "title": "Lễ Thành Hôn",
+      "datetime": "2027-01-17T09:30:00+07:00",
+      "venueName": "Tư gia nhà gái",
+      "address": "10B/25 Hai Bà Trưng, Thuận Hóa, Tp. Huế",
+      "mapsUrl": "https://maps.app.goo.gl/EPrfntQp9uy5s28v6",
+      "mapPreviewSrc": "assets/maps/ceremony-20dc1e39.jpg",
+      "mapPreviewLargeSrc": "assets/maps/ceremony-20dc1e39-lg.jpg"
+    },
+    "reception": {
+      "title": "Tiệc Cưới",
+      "datetime": "2027-01-17T16:30:00+07:00",
+      "venueName": "Trung Tâm Hội Nghị & Tiệc Cưới White Lotus Huế",
+      "address": "05 – 07 Hoàng Hoa Thám, Thuận Hóa, Tp. Huế",
+      "mapsUrl": "https://maps.app.goo.gl/iD8FtUMxDyFZb7Yd9",
+      "hallName": "Opera tầng 4",
+      "mapPreviewSrc": "assets/maps/reception-e285dc6f.jpg",
+      "mapPreviewLargeSrc": "assets/maps/reception-e285dc6f-lg.jpg"
+    },
+    "googleMapsUrl": "https://maps.app.goo.gl/iD8FtUMxDyFZb7Yd9",
+    "googleMapsEmbedUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5398.681434080283!2d107.58833688176264!3d16.465321461604596!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3141a1573bf3b68b%3A0x39d9e4a6bdf69bc!2zVHJ1bmcgVMOibSBI4buZaSBOZ2jhu4sgJiBUaeG7h2MgQ8aw4bubaSBXaGl0ZSBMb3R1cyBIdeG6vw!5e1!3m2!1sen!2s!4v1794707325594!5m2!1sen!2s",
+    "siteBaseUrl": "https://wedding.fiddle.vn",
+    "rsvpWebhookUrl": ""
+  },
+  "photos": [
+    {
+      "id": "photo-2be5b4da",
+      "caption": "",
+      "placement": "story",
+      "sortOrder": 1,
+      "focalPoint": null,
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 0.83301
+      },
+      "variants": [
+        {
+          "tier": "sm",
+          "format": "webp",
+          "width": 640,
+          "height": 800,
+          "src": "assets/images/photo-2be5b4da/photo-2be5b4da-sm.webp"
+        },
+        {
+          "tier": "sm",
+          "format": "jpg",
+          "width": 640,
+          "height": 800,
+          "src": "assets/images/photo-2be5b4da/photo-2be5b4da-sm.jpg"
+        },
+        {
+          "tier": "md",
+          "format": "webp",
+          "width": 859,
+          "height": 1074,
+          "src": "assets/images/photo-2be5b4da/photo-2be5b4da-md.webp"
+        },
+        {
+          "tier": "md",
+          "format": "jpg",
+          "width": 859,
+          "height": 1074,
+          "src": "assets/images/photo-2be5b4da/photo-2be5b4da-md.jpg"
+        },
+        {
+          "tier": "lg",
+          "format": "webp",
+          "width": 859,
+          "height": 1074,
+          "src": "assets/images/photo-2be5b4da/photo-2be5b4da-lg.webp"
+        },
+        {
+          "tier": "lg",
+          "format": "jpg",
+          "width": 859,
+          "height": 1074,
+          "src": "assets/images/photo-2be5b4da/photo-2be5b4da-lg.jpg"
+        },
+        {
+          "tier": "fhd",
+          "format": "webp",
+          "width": 859,
+          "height": 1074,
+          "src": "assets/images/photo-2be5b4da/photo-2be5b4da-fhd.webp"
+        },
+        {
+          "tier": "fhd",
+          "format": "jpg",
+          "width": 859,
+          "height": 1074,
+          "src": "assets/images/photo-2be5b4da/photo-2be5b4da-fhd.jpg"
+        }
+      ]
+    },
+    {
+      "id": "photo-602f8e54",
+      "caption": "",
+      "placement": "hero",
+      "sortOrder": 2,
+      "focalPoint": null,
+      "crop": {
+        "x": 0,
+        "y": 0.533556,
+        "w": 1,
+        "h": 0.374855
+      },
+      "variants": [
+        {
+          "tier": "sm",
+          "format": "webp",
+          "width": 640,
+          "height": 360,
+          "src": "assets/images/photo-602f8e54/photo-602f8e54-sm.webp"
+        },
+        {
+          "tier": "sm",
+          "format": "jpg",
+          "width": 640,
+          "height": 360,
+          "src": "assets/images/photo-602f8e54/photo-602f8e54-sm.jpg"
+        },
+        {
+          "tier": "md",
+          "format": "webp",
+          "width": 859,
+          "height": 483,
+          "src": "assets/images/photo-602f8e54/photo-602f8e54-md.webp"
+        },
+        {
+          "tier": "md",
+          "format": "jpg",
+          "width": 859,
+          "height": 483,
+          "src": "assets/images/photo-602f8e54/photo-602f8e54-md.jpg"
+        },
+        {
+          "tier": "lg",
+          "format": "webp",
+          "width": 859,
+          "height": 483,
+          "src": "assets/images/photo-602f8e54/photo-602f8e54-lg.webp"
+        },
+        {
+          "tier": "lg",
+          "format": "jpg",
+          "width": 859,
+          "height": 483,
+          "src": "assets/images/photo-602f8e54/photo-602f8e54-lg.jpg"
+        },
+        {
+          "tier": "fhd",
+          "format": "webp",
+          "width": 859,
+          "height": 483,
+          "src": "assets/images/photo-602f8e54/photo-602f8e54-fhd.webp"
+        },
+        {
+          "tier": "fhd",
+          "format": "jpg",
+          "width": 859,
+          "height": 483,
+          "src": "assets/images/photo-602f8e54/photo-602f8e54-fhd.jpg"
+        }
+      ]
+    }
+  ],
+  "seatingZones": [
+    {
+      "id": "ZONE_A1",
+      "relationship": "groom_family",
+      "nameVi": "Khu A1 - Gia đình & Họ hàng Chú Rể",
+      "hallSide": "left",
+      "row": "near_stage",
+      "tableRange": "Bàn 01 - Bàn 03",
+      "color": "#38BDF8"
+    },
+    {
+      "id": "ZONE_B1",
+      "relationship": "bride_family",
+      "nameVi": "Khu B1 - Gia đình & Họ hàng Cô Dâu",
+      "hallSide": "right",
+      "row": "near_stage",
+      "tableRange": "Bàn 04 - Bàn 06",
+      "color": "#EC4899"
+    },
+    {
+      "id": "ZONE_A3",
+      "relationship": "groom_parents_friends",
+      "nameVi": "Khu A2 - Khách mời Bố Mẹ Chú Rể",
+      "hallSide": "center",
+      "row": "center",
+      "tableRange": "Bàn 07 - Bàn 10",
+      "color": "#38BDF8"
+    },
+    {
+      "id": "ZONE_B3",
+      "relationship": "bride_parents_friends",
+      "nameVi": "Khu B2 - Khách mời Bố Mẹ Cô Dâu",
+      "hallSide": "center",
+      "row": "center",
+      "tableRange": "Bàn 11 - Bàn 14",
+      "color": "#EC4899"
+    },
+    {
+      "id": "ZONE_A2",
+      "relationship": "groom_friends",
+      "nameVi": "Khu A3 - Bạn bè & Đồng nghiệp Chú Rể",
+      "hallSide": "center",
+      "row": "center",
+      "tableRange": "Bàn 15 - Bàn 18",
+      "color": "#38BDF8"
+    },
+    {
+      "id": "ZONE_B2",
+      "relationship": "bride_friends",
+      "nameVi": "Khu B3 - Bạn bè & Đồng nghiệp Cô Dâu",
+      "hallSide": "center",
+      "row": "center",
+      "tableRange": "Bàn 19 - Bàn 22",
+      "color": "#EC4899"
+    },
+    {
+      "id": "ZONE_C1",
+      "relationship": "other",
+      "nameVi": "Khu C1 - Khu vực Khách Quý Chung",
+      "hallSide": "right",
+      "row": "middle",
+      "tableRange": "Bàn 23 - Bàn 24",
+      "color": "#7A1C24"
+    }
+  ],
+  "seatingLayout": {
+    "version": 1,
+    "tables": [
+      {
+        "id": "t1",
+        "number": 1,
+        "x": 62,
+        "y": 140,
+        "zoneId": "ZONE_A1"
+      },
+      {
+        "id": "t2",
+        "number": 2,
+        "x": 180.7,
+        "y": 140,
+        "zoneId": "ZONE_A1"
+      },
+      {
+        "id": "t3",
+        "number": 3,
+        "x": 299.3,
+        "y": 140,
+        "zoneId": "ZONE_A1"
+      },
+      {
+        "id": "t4",
+        "number": 4,
+        "x": 418,
+        "y": 140,
+        "zoneId": "ZONE_B1"
+      },
+      {
+        "id": "t5",
+        "number": 5,
+        "x": 582,
+        "y": 140,
+        "zoneId": "ZONE_B1"
+      },
+      {
+        "id": "t6",
+        "number": 6,
+        "x": 700.7,
+        "y": 140,
+        "zoneId": "ZONE_B1"
+      },
+      {
+        "id": "t7",
+        "number": 7,
+        "x": 819.3,
+        "y": 140,
+        "zoneId": "ZONE_A3"
+      },
+      {
+        "id": "t8",
+        "number": 8,
+        "x": 938,
+        "y": 140,
+        "zoneId": "ZONE_A3"
+      },
+      {
+        "id": "t9",
+        "number": 9,
+        "x": 62,
+        "y": 270,
+        "zoneId": "ZONE_A3"
+      },
+      {
+        "id": "t10",
+        "number": 10,
+        "x": 180.7,
+        "y": 270,
+        "zoneId": "ZONE_A3"
+      },
+      {
+        "id": "t11",
+        "number": 11,
+        "x": 299.3,
+        "y": 270,
+        "zoneId": "ZONE_B3"
+      },
+      {
+        "id": "t12",
+        "number": 12,
+        "x": 418,
+        "y": 270,
+        "zoneId": "ZONE_B3"
+      },
+      {
+        "id": "t13",
+        "number": 13,
+        "x": 582,
+        "y": 270,
+        "zoneId": "ZONE_B3"
+      },
+      {
+        "id": "t14",
+        "number": 14,
+        "x": 700.7,
+        "y": 270,
+        "zoneId": "ZONE_B3"
+      },
+      {
+        "id": "t15",
+        "number": 15,
+        "x": 819.3,
+        "y": 270,
+        "zoneId": "ZONE_A2"
+      },
+      {
+        "id": "t16",
+        "number": 16,
+        "x": 938,
+        "y": 270,
+        "zoneId": "ZONE_A2"
+      },
+      {
+        "id": "t17",
+        "number": 17,
+        "x": 62,
+        "y": 400,
+        "zoneId": "ZONE_A2"
+      },
+      {
+        "id": "t18",
+        "number": 18,
+        "x": 180.7,
+        "y": 400,
+        "zoneId": "ZONE_A2"
+      },
+      {
+        "id": "t19",
+        "number": 19,
+        "x": 299.3,
+        "y": 400,
+        "zoneId": "ZONE_B2"
+      },
+      {
+        "id": "t20",
+        "number": 20,
+        "x": 418,
+        "y": 400,
+        "zoneId": "ZONE_B2"
+      },
+      {
+        "id": "t21",
+        "number": 21,
+        "x": 582,
+        "y": 400,
+        "zoneId": "ZONE_B2"
+      },
+      {
+        "id": "t22",
+        "number": 22,
+        "x": 700.7,
+        "y": 400,
+        "zoneId": "ZONE_B2"
+      },
+      {
+        "id": "t23",
+        "number": 23,
+        "x": 819.3,
+        "y": 400,
+        "zoneId": "ZONE_C1"
+      },
+      {
+        "id": "t24",
+        "number": 24,
+        "x": 938,
+        "y": 400,
+        "zoneId": "ZONE_C1"
+      },
+      {
+        "id": "t25",
+        "number": 25,
+        "x": 62,
+        "y": 530,
+        "zoneId": null
+      },
+      {
+        "id": "t26",
+        "number": 26,
+        "x": 180.7,
+        "y": 530,
+        "zoneId": null
+      },
+      {
+        "id": "t27",
+        "number": 27,
+        "x": 299.3,
+        "y": 530,
+        "zoneId": null
+      },
+      {
+        "id": "t28",
+        "number": 28,
+        "x": 418,
+        "y": 530,
+        "zoneId": null
+      },
+      {
+        "id": "t29",
+        "number": 29,
+        "x": 582,
+        "y": 530,
+        "zoneId": null
+      },
+      {
+        "id": "t30",
+        "number": 30,
+        "x": 700.7,
+        "y": 530,
+        "zoneId": null
+      },
+      {
+        "id": "t31",
+        "number": 31,
+        "x": 819.3,
+        "y": 530,
+        "zoneId": null
+      },
+      {
+        "id": "t32",
+        "number": 32,
+        "x": 938,
+        "y": 530,
+        "zoneId": null
+      },
+      {
+        "id": "t33",
+        "number": 33,
+        "x": 62,
+        "y": 660,
+        "zoneId": null
+      },
+      {
+        "id": "t34",
+        "number": 34,
+        "x": 180.7,
+        "y": 660,
+        "zoneId": null
+      },
+      {
+        "id": "t35",
+        "number": 35,
+        "x": 299.3,
+        "y": 660,
+        "zoneId": null
+      },
+      {
+        "id": "t36",
+        "number": 36,
+        "x": 418,
+        "y": 660,
+        "zoneId": null
+      },
+      {
+        "id": "t37",
+        "number": 37,
+        "x": 582,
+        "y": 660,
+        "zoneId": null
+      },
+      {
+        "id": "t38",
+        "number": 38,
+        "x": 700.7,
+        "y": 660,
+        "zoneId": null
+      },
+      {
+        "id": "t39",
+        "number": 39,
+        "x": 819.3,
+        "y": 660,
+        "zoneId": null
+      },
+      {
+        "id": "t40",
+        "number": 40,
+        "x": 938,
+        "y": 660,
+        "zoneId": null
+      }
+    ]
+  },
+  "builtAt": "2026-11-16T01:04:22.768Z"
+}
