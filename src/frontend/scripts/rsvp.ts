@@ -1,7 +1,7 @@
 /** RSVP form: validation, unique-phone webhook submission (text/plain, CORS-safe), thank-you view, auto-return. */
 import { isValidVnPhone, normalizeVnPhone } from '../../shared/phone-normalizer';
 import { resolveRelationship } from '../../shared/guest-codec';
-import { RELATIONSHIP_GROUPS, type RsvpSubmission } from '../../shared/types';
+import { RELATIONSHIP_GROUPS, type RsvpFormConfig, type RsvpSubmission } from '../../shared/types';
 
 type FetchLike = (url: string, init: RequestInit) => Promise<Response>;
 export type RsvpField = 'fullName' | 'phone' | 'relationship' | 'attendees';
@@ -42,6 +42,27 @@ export async function submitRsvp(webhookUrl: string, sub: RsvpSubmission, fetchI
   const data = (await res.json()) as { ok: boolean; operation?: 'INSERTED' | 'UPDATED'; error?: string };
   if (!data.ok) throw new Error(data.error ?? 'Không gửi được đăng ký');
   return { operation: data.operation ?? 'INSERTED' };
+}
+
+/** Submit to a Google Form via its public formResponse endpoint (opaque no-cors response). */
+export async function submitGoogleForm(form: RsvpFormConfig, sub: RsvpSubmission, fetchImpl: FetchLike = (u, i) => fetch(u, i)): Promise<{ operation: 'INSERTED' }> {
+  const body = new URLSearchParams({
+    [`entry.${form.entryFullName}`]: sub.fullName,
+    [`entry.${form.entryPhone}`]: sub.phone,
+    [`entry.${form.entryRelationship}`]: sub.relationship,
+    [`entry.${form.entryAttendees}`]: String(sub.attendees),
+  });
+  await fetchImpl(`https://docs.google.com/forms/d/e/${form.formId}/formResponse`, { method: 'POST', mode: 'no-cors', body });
+  return { operation: 'INSERTED' };
+}
+
+function parseGform(raw: string | undefined): RsvpFormConfig | null {
+  try {
+    const f = JSON.parse(raw || '{}') as Partial<RsvpFormConfig>;
+    return f.formId && f.entryFullName && f.entryPhone && f.entryRelationship && f.entryAttendees ? (f as RsvpFormConfig) : null;
+  } catch {
+    return null;
+  }
 }
 
 export interface RsvpPageOptions {
@@ -85,7 +106,10 @@ export function initRsvpPage(doc: Document = document, opts: RsvpPageOptions = {
     button.disabled = true;
     button.textContent = 'Đang gửi…';
     try {
-      const { operation } = await submitRsvp(form.dataset.webhook ?? '', result.submission, opts.fetchImpl);
+      const gform = parseGform(form.dataset.gform);
+      const { operation } = gform
+        ? await submitGoogleForm(gform, result.submission, opts.fetchImpl)
+        : await submitRsvp(form.dataset.webhook ?? '', result.submission, opts.fetchImpl);
       form.hidden = true;
       thanks.hidden = false;
       thanks.querySelector('.rsvp__thanks-text')!.textContent =

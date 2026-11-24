@@ -163,6 +163,17 @@ export interface WeddingConfig {
   siteBaseUrl: string;
   /** Google Apps Script Web App URL receiving RSVP submissions. */
   rsvpWebhookUrl: string;
+  /** Google Form receiving RSVP submissions (preferred over the webhook when formId is set). */
+  rsvpForm: RsvpFormConfig;
+}
+
+export interface RsvpFormConfig {
+  formId: string;
+  /** Google Form entry IDs (the number in `entry.<id>`). */
+  entryFullName: string;
+  entryPhone: string;
+  entryRelationship: string;
+  entryAttendees: string;
 }
 
 export type PhotoPlacement = 'hero' | 'story' | 'gallery' | 'rsvp_background' | 'invite_portrait' | 'static_map';

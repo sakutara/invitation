@@ -1,12 +1,12 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderRsvpPage } from '../../src/frontend/templates/rsvp.template';
-import { validateRsvp, submitRsvp, initRsvpPage } from '../../src/frontend/scripts/rsvp';
+import { validateRsvp, submitRsvp, submitGoogleForm, initRsvpPage } from '../../src/frontend/scripts/rsvp';
 import { DEFAULT_CONFIG } from '../../src/shared/default-config';
 import { RELATIONSHIP_GROUPS, RELATIONSHIP_KEYS, SEATING_ZONES } from '../../src/shared/types';
 
 const WEBHOOK = 'https://script.google.com/macros/s/TEST/exec';
-const html = renderRsvpPage({ config: { ...DEFAULT_CONFIG, rsvpWebhookUrl: WEBHOOK }, photos: [], seatingZones: SEATING_ZONES, builtAt: '' });
+const html = renderRsvpPage({ config: { ...DEFAULT_CONFIG, rsvpWebhookUrl: WEBHOOK, rsvpForm: { ...DEFAULT_CONFIG.rsvpForm, formId: '' } }, photos: [], seatingZones: SEATING_ZONES, builtAt: '' });
 
 function mount() {
   document.documentElement.innerHTML = html.replace(/^[\s\S]*?<html[^>]*>/, '').replace(/<\/html>\s*$/, '');
@@ -140,5 +140,19 @@ describe('initRsvpPage', () => {
     await vi.waitFor(() => expect($<HTMLElement>('.rsvp__message').textContent!.length).toBeGreaterThan(0));
     expect($<HTMLElement>('.rsvp__thanks').hidden).toBe(true);
     expect($<HTMLButtonElement>('.rsvp__submit').disabled).toBe(false);
+  });
+});
+
+describe('submitGoogleForm', () => {
+  it('posts entry.* fields to the formResponse endpoint', async () => {
+    const fetchImpl = vi.fn(async () => new Response(null));
+    await submitGoogleForm(DEFAULT_CONFIG.rsvpForm, { fullName: 'An', phone: '0905123456', relationship: 'Bạn bè', attendees: 2 }, fetchImpl);
+    const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe(`https://docs.google.com/forms/d/e/${DEFAULT_CONFIG.rsvpForm.formId}/formResponse`);
+    const body = init.body as URLSearchParams;
+    expect(body.get('entry.895620619')).toBe('An');
+    expect(body.get('entry.50183105')).toBe('0905123456');
+    expect(body.get('entry.1545696181')).toBe('Bạn bè');
+    expect(body.get('entry.261159171')).toBe('2');
   });
 });
