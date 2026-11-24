@@ -56,6 +56,7 @@ function render(config) {
       eventSection('ceremony', 'Lễ thành hôn'),
       eventSection('reception', 'Tiệc cưới'),
     ),
+    googleFormSection(),
     h(
       'details',
       { class: 'mt-2' },
@@ -63,12 +64,7 @@ function render(config) {
       section(
         'Kỹ thuật',
         f('siteBaseUrl', 'Địa chỉ website'),
-        f('rsvpWebhookUrl', 'Webhook Google Apps Script'),
-        f('rsvpForm.formId', 'Google Form ID'),
-        f('rsvpForm.entryFullName', 'Entry ID: Họ tên'),
-        f('rsvpForm.entryPhone', 'Entry ID: Số điện thoại'),
-        f('rsvpForm.entryRelationship', 'Entry ID: Liên hệ'),
-        f('rsvpForm.entryAttendees', 'Entry ID: Số lượng'),
+        f('rsvpWebhookUrl', 'Webhook Google Apps Script (đồng bộ danh sách khách)'),
         f('googleMapsEmbedUrl', 'Link nhúng bản đồ (iframe)'),
       ),
     ),
@@ -80,6 +76,25 @@ function render(config) {
     ),
   );
   for (const key of EVENTS) paintPreview(key);
+}
+
+const FORM_ENTRIES = [
+  ['entryFullName', 'Họ và tên'],
+  ['entryPhone', 'Số điện thoại'],
+  ['entryRelationship', 'Mối quan hệ'],
+  ['entryAttendees', 'Số người tham dự'],
+];
+
+// RSVP goes to a Google Form: only the Form ID and the 4 question (entry) IDs are needed.
+function googleFormSection() {
+  return section(
+    'Google Form nhận đăng ký',
+    f('rsvpForm.formId', 'Form ID', {
+      hint: 'Chuỗi trong link form: docs.google.com/forms/d/e/<Form ID>/viewform (dán cả link cũng được).',
+    }),
+    row(...FORM_ENTRIES.slice(0, 2).map(([k, label]) => f(`rsvpForm.${k}`, `Mã ô "${label}"`, { digits: true, hint: 'Số sau entry. trong link điền sẵn' }))),
+    row(...FORM_ENTRIES.slice(2).map(([k, label]) => f(`rsvpForm.${k}`, `Mã ô "${label}"`, { digits: true, hint: 'Số sau entry. trong link điền sẵn' }))),
+  );
 }
 
 function parentsSection(key, legend) {
@@ -113,11 +128,11 @@ function eventSection(key, legend) {
 }
 
 /** Creates a labelled input and registers it under its config path for validation and saving. */
-function f(name, label, { multiline = false, type = 'text', required = false, url = false, hint, value } = {}) {
+function f(name, label, { multiline = false, type = 'text', required = false, url = false, digits = false, hint, value } = {}) {
   const input = multiline ? h('textarea', { class: 'input', rows: 4 }) : h('input', { class: 'input', type, autocomplete: 'off' });
   input.value = value ?? get(name);
   const where = EVENT_NAMES[name.split('.')[0]];
-  fields.set(name, { input, label, where, required, url });
+  fields.set(name, { input, label, where, required, url, digits });
   input.addEventListener('input', () => mark(input, false));
   return h('label', { class: 'field min-w-0' }, h('span', { class: 'label' }, label), input, hint ? h('small', { class: 'hint' }, hint) : null);
 }
@@ -158,17 +173,21 @@ function mark(input, invalid) {
 /** Marks invalid inputs and returns Vietnamese problem messages (empty when valid). */
 function validate() {
   const problems = [];
-  for (const { input, label, where, required, url } of fields.values()) {
+  for (const { input, label, where, required, url, digits } of fields.values()) {
     const value = input.value.trim();
     const prefix = where ? `${where} · ` : '';
     let problem = null;
     if (required && !value) problem = `${prefix}${label} không được để trống`;
     else if (url && value && !value.startsWith('http')) problem = `${prefix}${label} phải bắt đầu bằng http`;
+    else if (digits && value && !/^\d+$/.test(value)) problem = `${label} chỉ gồm chữ số`;
     mark(input, Boolean(problem));
     if (problem) problems.push(problem);
   }
   return problems;
 }
+
+/** Accepts a bare Form ID or a pasted form link (…/forms/d/e/<id>/viewform) and returns the ID. */
+const parseFormId = (value) => value.match(/\/forms\/d\/e\/([\w-]+)/)?.[1] ?? value;
 
 const v = (name) => fields.get(name).input.value.trim();
 
@@ -205,7 +224,7 @@ function collect() {
     siteBaseUrl: v('siteBaseUrl'),
     rsvpWebhookUrl: v('rsvpWebhookUrl'),
     rsvpForm: {
-      formId: v('rsvpForm.formId'),
+      formId: parseFormId(v('rsvpForm.formId')),
       entryFullName: v('rsvpForm.entryFullName'),
       entryPhone: v('rsvpForm.entryPhone'),
       entryRelationship: v('rsvpForm.entryRelationship'),
