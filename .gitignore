@@ -6,3 +6,6 @@ output/
 test-results/
 playwright-report/
 .tmp/
+
+# Published site (GitHub Pages serves main:/docs) needs its data JSON
+!docs/assets/data/
