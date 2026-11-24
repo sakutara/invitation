@@ -22,7 +22,7 @@ export function renderRsvpPage(data: PageData): string {
   <section class="rsvp__panel" aria-labelledby="rsvp-title">
     <h1 class="rsvp__title" id="rsvp-title">Xác nhận tham dự</h1>
     <p class="rsvp__lead">${escapeHtml(config.groomName)} &amp; ${escapeHtml(config.brideName)} · ${escapeHtml(`${wedding.weekday}, ${wedding.date}`)}</p>
-    <form class="rsvp__form" novalidate data-webhook="${escapeHtml(config.rsvpWebhookUrl)}">
+    <form class="rsvp__form" novalidate data-webhook="${escapeHtml(config.rsvpWebhookUrl)}" data-gform="${escapeHtml(JSON.stringify(config.rsvpForm ?? {}))}">
       ${field('fullName', 'Họ và tên', `<input id="fullName" name="fullName" type="text" autocomplete="name" required maxlength="120" placeholder="Nguyễn Văn A" aria-describedby="fullName-error">`)}
       ${field('phone', 'Số điện thoại', `<input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required placeholder="09xx xxx xxx" aria-describedby="phone-error">`)}
       <div class="rsvp__row">

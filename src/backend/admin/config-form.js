@@ -64,6 +64,11 @@ function render(config) {
         'Kỹ thuật',
         f('siteBaseUrl', 'Địa chỉ website'),
         f('rsvpWebhookUrl', 'Webhook Google Apps Script'),
+        f('rsvpForm.formId', 'Google Form ID'),
+        f('rsvpForm.entryFullName', 'Entry ID: Họ tên'),
+        f('rsvpForm.entryPhone', 'Entry ID: Số điện thoại'),
+        f('rsvpForm.entryRelationship', 'Entry ID: Liên hệ'),
+        f('rsvpForm.entryAttendees', 'Entry ID: Số lượng'),
         f('googleMapsEmbedUrl', 'Link nhúng bản đồ (iframe)'),
       ),
     ),
@@ -199,6 +204,13 @@ function collect() {
     googleMapsEmbedUrl: v('googleMapsEmbedUrl'),
     siteBaseUrl: v('siteBaseUrl'),
     rsvpWebhookUrl: v('rsvpWebhookUrl'),
+    rsvpForm: {
+      formId: v('rsvpForm.formId'),
+      entryFullName: v('rsvpForm.entryFullName'),
+      entryPhone: v('rsvpForm.entryPhone'),
+      entryRelationship: v('rsvpForm.entryRelationship'),
+      entryAttendees: v('rsvpForm.entryAttendees'),
+    },
   };
 }
 

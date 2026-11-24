@@ -25,4 +25,11 @@ export const DEFAULT_CONFIG: WeddingConfig = {
   googleMapsEmbedUrl: 'https://maps.google.com/maps?q=45+Nguyen+Van+Linh+Ninh+Kieu+Can+Tho&output=embed',
   siteBaseUrl: 'https://example.com',
   rsvpWebhookUrl: '',
+  rsvpForm: {
+    formId: '1FAIpQLSe5NepJTUAt-RkW1IXkMkqZ-K-VrZ0Jou-ugnl-TemNdl00vA',
+    entryFullName: '895620619',
+    entryPhone: '50183105',
+    entryRelationship: '1545696181',
+    entryAttendees: '261159171',
+  },
 };
