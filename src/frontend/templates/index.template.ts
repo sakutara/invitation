@@ -2,7 +2,9 @@
 import { escapeHtml } from '../../shared/html';
 import { formatViDateTime } from '../../shared/date-format';
 import type { WeddingData } from '../../shared/types';
+import { resolveInvitation } from '../../shared/default-config';
 import { documentShell, eventCard, firstPhoto, ornament, picture, variant } from './partials';
+import { calendarSection, closingSection, countdownSection, envelopeScene, rsvpCtaSection } from './envelope.partials';
 
 type PageData = Omit<WeddingData, 'guests'> & { builtAt?: string };
 
@@ -13,6 +15,7 @@ export function renderIndexPage(data: PageData): string {
   const gallery = photos.filter((p) => p.placement === 'gallery');
   const wedding = formatViDateTime(config.reception.datetime || config.ceremony.datetime);
   const heroImg = hero ? variant(hero, 'lg') : undefined;
+  const inv = resolveInvitation(config);
 
   const galleryHtml = gallery.length
     ? `<div class="gallery">${gallery
@@ -30,19 +33,23 @@ export function renderIndexPage(data: PageData): string {
 
   const body = `
 <main>
+${envelopeScene(config, photos)}
   <section id="hero" class="section parallax hero">
     <div class="parallax__layer${hero ? '' : ' hero__fallback-bg'}" data-parallax-speed="0.25">${
       heroImg ? `<img src="${escapeHtml(heroImg.src)}" alt="" fetchpriority="high" width="${heroImg.width}" height="${heroImg.height}">` : ''
     }</div>
     ${ornament('tl')}${ornament('br')}
     <div class="container" data-parallax-speed="0">
-      <span class="eyebrow hero__eyebrow">Save the date</span>
-      <h1 class="hero__names">${escapeHtml(config.groomName)}<span class="hero__amp">&amp;</span>${escapeHtml(config.brideName)}</h1>
-      <p class="hero__date">${escapeHtml(`${wedding.weekday} · ${wedding.date}`)}</p>
-      <p class="hero__headline">${escapeHtml(config.headline)}</p>
-      <div class="hero__actions">
-        <a class="btn" href="rsvp.html" data-cta="rsvp">Đăng ký tham dự</a>
-        <a class="btn btn--ghost" href="#schedule">Xem lịch trình</a>
+      <div class="hero__letter" data-scroll-progress data-scroll-span="0.9">
+        <span class="eyebrow hero__eyebrow rise" style="--d:0">${escapeHtml(inv.momentLine)}</span>
+        <p class="hero__script script rise" style="--d:.08">${escapeHtml(inv.scriptHeadline)}</p>
+        <h2 class="hero__names rise" style="--d:.16">${escapeHtml(config.groomName)}<span class="hero__amp">&amp;</span>${escapeHtml(config.brideName)}</h2>
+        <p class="hero__date rise" style="--d:.26">${escapeHtml(`${wedding.weekday} · ${wedding.date}`)}</p>
+        <p class="hero__headline rise" style="--d:.32">${escapeHtml(config.headline)}</p>
+        <div class="hero__actions rise" style="--d:.4">
+          <a class="btn" href="rsvp.html" data-cta="rsvp">Đăng ký tham dự</a>
+          <a class="btn btn--ghost" href="#schedule">Xem lịch trình</a>
+        </div>
       </div>
     </div>
     <a class="hero__scroll" href="#story" aria-label="Cuộn xuống">CUỘN XUỐNG ↓</a>
@@ -72,17 +79,21 @@ export function renderIndexPage(data: PageData): string {
     </div>
   </section>
 
+${calendarSection(config)}
+
   <section id="schedule" class="section parallax section--navy">
     ${ornament('br')}
     <div class="container" data-parallax-speed="0">
       <span class="eyebrow">Lịch trình</span>
-      <h2 class="section-title">Ngày chung đôi</h2>
+      <h2 class="section-title">Hôn lễ &amp; tiệc cưới</h2>
       <div class="events">
         ${eventCard(config.ceremony, config.googleMapsUrl)}
         ${eventCard(config.reception, config.googleMapsUrl)}
       </div>
     </div>
   </section>
+
+${countdownSection(config, photos)}
 
   <section id="gallery" class="section parallax">
     ${ornament('tl')}
@@ -93,13 +104,8 @@ export function renderIndexPage(data: PageData): string {
     </div>
   </section>
 
-  <section id="rsvp-cta" class="section section--cream">
-    <div class="container cta">
-      <h2 class="section-title">Bạn sẽ đến chứ?</h2>
-      <p>Hãy cho chúng mình biết bạn có thể tham dự để gia đình chuẩn bị chu đáo nhất nhé.</p>
-      <a class="btn" href="rsvp.html" data-cta="rsvp-bottom">Đăng ký tham dự</a>
-    </div>
-  </section>
+${rsvpCtaSection(config, photos, 'data-cta="rsvp-bottom"')}
+${closingSection(config)}
 </main>
 <footer class="site-footer">${escapeHtml(config.groomName)} &amp; ${escapeHtml(config.brideName)} · ${escapeHtml(wedding.date)}</footer>`;
 

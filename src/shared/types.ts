@@ -165,6 +165,33 @@ export interface WeddingConfig {
   rsvpWebhookUrl: string;
   /** Google Form receiving RSVP submissions (preferred over the webhook when formId is set). */
   rsvpForm: RsvpFormConfig;
+  /** Wording of the scroll-driven envelope invitation (invite.html). Missing keys fall back to DEFAULT_INVITATION. */
+  invitation?: Partial<InvitationContent>;
+}
+
+/** Editable texts of the envelope invitation page. Empty strings fall back to the defaults / derived values. */
+export interface InvitationContent {
+  /** Small caps line above the names on the closed envelope. */
+  coverEyebrow: string;
+  /** Hint under the wax seal telling guests to scroll. */
+  openHint: string;
+  /** Line at the top of the card that slides out of the envelope. */
+  cardEyebrow: string;
+  /** Monogram on the wax seal and closing card; empty = initials of the given names. */
+  monogram: string;
+  momentLine: string;
+  scriptHeadline: string;
+  joinLine: string;
+  /** City / place shown under the invitation; empty = last part of the reception address. */
+  place: string;
+  calendarTitle: string;
+  countdownTitle: string;
+  countdownDoneText: string;
+  rsvpTitle: string;
+  rsvpNote: string;
+  closingTitle: string;
+  closingNote: string;
+  contact: string;
 }
 
 export interface RsvpFormConfig {

@@ -1,5 +1,24 @@
 /** Seed content used on first run of the local CMS. Every field is editable via PUT /api/config. */
-import type { WeddingConfig } from './types';
+import type { InvitationContent, WeddingConfig } from './types';
+
+export const DEFAULT_INVITATION: InvitationContent = {
+  coverEyebrow: 'Thư mời hạnh phúc từ',
+  openHint: 'Cuộn xuống để mở thiệp',
+  cardEyebrow: 'Save the date',
+  monogram: '',
+  momentLine: 'Khoảnh khắc ấy đã đến…',
+  scriptHeadline: 'Chúng mình về chung một nhà',
+  joinLine: 'Trân trọng kính mời',
+  place: '',
+  calendarTitle: 'Ngày chung đôi',
+  countdownTitle: 'Hẹn gặp bạn trong ngày vui',
+  countdownDoneText: 'Cảm ơn bạn đã cùng chung vui',
+  rsvpTitle: 'Bạn sẽ đến chung vui chứ?',
+  rsvpNote: 'Mong bạn xác nhận tham dự để chúng mình chuẩn bị chu đáo nhất.',
+  closingTitle: 'Thân thương',
+  closingNote: 'Mọi thắc mắc xin liên hệ cô dâu & chú rể',
+  contact: '',
+};
 
 export const DEFAULT_CONFIG: WeddingConfig = {
   groomName: 'Minh Quân',
@@ -32,4 +51,22 @@ export const DEFAULT_CONFIG: WeddingConfig = {
     entryRelationship: '1545696181',
     entryAttendees: '261159171',
   },
+  invitation: { ...DEFAULT_INVITATION },
 };
+
+/** Initials of the given (last) names: "Hoàng Trung" + "Bảo Châu" -> "T&C". */
+export function defaultMonogram(groomName: string, brideName: string): string {
+  const initial = (n: string) => (n.trim().split(/\s+/).pop() ?? '').charAt(0).toLocaleUpperCase('vi');
+  return `${initial(groomName)}&${initial(brideName)}`;
+}
+
+/** Invitation wording with defaults and derived values filled in. */
+export function resolveInvitation(config: WeddingConfig): InvitationContent {
+  const out = { ...DEFAULT_INVITATION };
+  for (const [k, v] of Object.entries(config.invitation ?? {})) {
+    if (typeof v === 'string' && v.trim()) out[k as keyof InvitationContent] = v.trim();
+  }
+  if (!out.monogram) out.monogram = defaultMonogram(config.groomName, config.brideName);
+  if (!out.place) out.place = config.reception.address.split(',').pop()?.trim() ?? '';
+  return out;
+}

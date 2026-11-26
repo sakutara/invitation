@@ -9,6 +9,7 @@ import type { WeddingData } from '../shared/types';
 import { renderIndexPage } from '../frontend/templates/index.template';
 import { renderRsvpPage } from '../frontend/templates/rsvp.template';
 import { renderInvitePage } from '../frontend/templates/invite.template';
+import { buildIcs } from '../shared/wedding-calendar';
 
 export const PROJECT_ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const FRONTEND = join(PROJECT_ROOT, 'src/frontend');
@@ -98,6 +99,7 @@ export class StaticBuilder {
       'invite.html': renderInvitePage(publicData),
       'assets/data/wedding-data.json': JSON.stringify(publicData, null, 2),
       'assets/data/guests-map.json': JSON.stringify(buildGuestsMapSync(data.guests)),
+      'assets/data/wedding.ics': buildIcs(data.config),
     };
 
     const css = join(FRONTEND, 'styles/main.css');

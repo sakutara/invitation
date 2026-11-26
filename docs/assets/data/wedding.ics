@@ -1,0 +1,34 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//wedding-webapp//invite//VI
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:ceremony-20270117T023000Z@wedding-webapp
+DTSTAMP:20261126T171725Z
+DTSTART:20270117T023000Z
+DTEND:20270117T043000Z
+SUMMARY:Lễ Thành Hôn · Hoàng Trung & Bảo Châu
+LOCATION:Tư gia nhà gái\, 10B/25 Hai Bà Trưng\, Thuận Hóa\, Tp. Huế
+URL:https://maps.app.goo.gl/EPrfntQp9uy5s28v6
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Ngày mai: Lễ Thành Hôn Hoàng Trung & Bảo Châu
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:reception-20270117T093000Z@wedding-webapp
+DTSTAMP:20261126T171725Z
+DTSTART:20270117T093000Z
+DTEND:20270117T123000Z
+SUMMARY:Tiệc Cưới · Hoàng Trung & Bảo Châu
+LOCATION:Trung Tâm Hội Nghị & Tiệc Cưới White Lotus Huế\, Opera tầng 4\, 05 – 07 Hoàng Hoa Thám\, Thuận Hóa\, Tp. Huế
+URL:https://maps.app.goo.gl/iD8FtUMxDyFZb7Yd9
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Ngày mai: Tiệc Cưới Hoàng Trung & Bảo Châu
+END:VALARM
+END:VEVENT
+END:VCALENDAR

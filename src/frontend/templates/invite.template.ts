@@ -3,8 +3,10 @@ import { escapeHtml, jsonForScript } from '../../shared/html';
 import { formatViDateTime } from '../../shared/date-format';
 import { formatInvitation } from '../../shared/invitation-formatter';
 import { mapSeating, renderSeatingMapSvg } from '../../shared/seating-mapper';
+import { resolveInvitation } from '../../shared/default-config';
 import { FALLBACK_GUEST, type WeddingData } from '../../shared/types';
 import { documentShell, eventCard, firstPhoto, ornament, picture, variant } from './partials';
+import { calendarSection, closingSection, countdownSection, envelopeScene, rsvpCtaSection } from './envelope.partials';
 
 type PageData = Omit<WeddingData, 'guests'> & { builtAt?: string };
 
@@ -22,38 +24,43 @@ function illustratedMap(address: string, venue: string): string {
 
 export function renderInvitePage(data: PageData): string {
   const { config, photos, seatingZones } = data;
+  const inv = resolveInvitation(config);
   const hero = firstPhoto(photos, 'hero', 'gallery');
   const heroImg = hero ? variant(hero, 'lg') : undefined;
   const staticMap = firstPhoto(photos, 'static_map');
-  const wedding = formatViDateTime(config.reception.datetime || config.ceremony.datetime);
+  const mainIso = config.reception.datetime || config.ceremony.datetime;
+  const wedding = formatViDateTime(mainIso);
   const fallbackSeat = mapSeating(FALLBACK_GUEST, seatingZones);
   const publicData = { config, photos, seatingZones, seatingLayout: data.seatingLayout ?? null };
+  const groom = escapeHtml(config.groomName);
+  const bride = escapeHtml(config.brideName);
 
   const body = `
 <main>
-  <section id="invite-hero" class="section parallax invite-hero">
-    <div class="parallax__layer${hero ? '' : ' hero__fallback-bg'}" data-parallax-speed="0.25">${
-      heroImg ? `<img src="${escapeHtml(heroImg.src)}" alt="" fetchpriority="high" width="${heroImg.width}" height="${heroImg.height}">` : ''
-    }</div>
+${envelopeScene(config, photos)}
+  <section id="invite-hero" class="section parallax letter-section">
     ${ornament('tl')}${ornament('br')}
-    <div class="container" style="display:grid;place-items:center">
-      <article class="card invite-card" data-parallax-speed="0">
-        <span class="eyebrow">Thiệp mời cưới</span>
-        <span class="invite-card__badge badge--shared" data-role="guest-badge" hidden>Khách quý</span>
-        <h1 class="invite-card__names">${escapeHtml(config.groomName)} &amp; ${escapeHtml(config.brideName)}</h1>
-        <p class="invite-greeting" data-role="greeting">${escapeHtml(formatInvitation(FALLBACK_GUEST))}</p>
-        <hr class="divider">
-        <p class="invite-card__date">${escapeHtml(`${wedding.time} · ${wedding.weekday}, ${wedding.date}`)}</p>
-        <div class="hero__actions">
-          <a class="btn" href="#card">Lưu thiệp JPG</a>
-          <a class="btn btn--navy" href="#seating">Xem chỗ ngồi</a>
-        </div>
-      </article>
+    <div class="container letter" data-scroll-progress data-scroll-span="0.9">
+      <span class="eyebrow rise" style="--d:0">${escapeHtml(inv.momentLine)}</span>
+      <h2 class="letter__script script rise" style="--d:.08">${escapeHtml(inv.scriptHeadline)}</h2>
+      <span class="invite-card__badge badge--shared rise" style="--d:.14" data-role="guest-badge" hidden>Khách quý</span>
+      <p class="letter__join rise" style="--d:.18">${escapeHtml(inv.joinLine)}</p>
+      <p class="invite-greeting rise" style="--d:.24" data-role="greeting">${escapeHtml(formatInvitation(FALLBACK_GUEST))}</p>
+      <hr class="divider rise" style="--d:.3">
+      <p class="letter__names rise" style="--d:.34">${groom} <span class="script">&amp;</span> ${bride}</p>
+      <p class="letter__place rise" style="--d:.4">${escapeHtml(inv.place)}</p>
+      <p class="invite-card__date rise" style="--d:.44">${escapeHtml(`${wedding.time} · ${wedding.weekday}, ${wedding.date}`)}</p>
+      <div class="hero__actions rise" style="--d:.5">
+        <a class="btn" href="#card">Lưu thiệp JPG</a>
+        <a class="btn btn--navy" href="#seating">Xem chỗ ngồi</a>
+      </div>
     </div>
   </section>
 
-  <section id="events" class="section parallax section--navy">
-    ${ornament('tl')}
+${calendarSection(config)}
+${countdownSection(config, photos)}
+  <section id="events" class="section parallax section--cream">
+    ${ornament('br')}
     <div class="container" data-parallax-speed="0">
       <span class="eyebrow">Thông tin hôn lễ</span>
       <h2 class="section-title">Lịch trình</h2>
@@ -94,6 +101,7 @@ export function renderInvitePage(data: PageData): string {
     </div>
   </section>
 
+${rsvpCtaSection(config, photos, 'data-role="rsvp-link"')}
   <section id="card" class="section">
     <div class="container save-card">
       <div class="save-card__preview"><img alt="Thiệp mời cá nhân hoá" width="1080" height="1620"></div>
@@ -110,8 +118,10 @@ export function renderInvitePage(data: PageData): string {
       </div>
     </div>
   </section>
+
+${closingSection(config)}
 </main>
-<footer class="site-footer">${escapeHtml(config.groomName)} &amp; ${escapeHtml(config.brideName)} · ${escapeHtml(wedding.date)}</footer>
+<footer class="site-footer">${groom} &amp; ${bride} · ${escapeHtml(wedding.date)}</footer>
 <script type="application/json" id="wedding-data">${jsonForScript(publicData)}</script>`;
 
   return documentShell({

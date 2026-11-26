@@ -8,6 +8,9 @@ import { CARD_SPEC, FALLBACK_GUEST, RELATIONSHIP_GROUPS, type GuestInvitePayload
 import { initParallax } from './parallax';
 import { initReveal } from './reveal';
 import { initMapPopup } from './map-popup';
+import { initEnvelopePage } from './envelope-page';
+
+export { countdownParts } from './envelope-page';
 
 type SaveMode = 'download' | 'share';
 export type SaveResult = 'shared' | 'downloaded' | 'cancelled';
@@ -209,6 +212,7 @@ export async function initInvitePage(doc: Document = document, opts: InviteOptio
 if (typeof document !== 'undefined' && document.body?.classList.contains('page-invite') && document.getElementById('wedding-data')) {
   document.documentElement.classList.remove('no-js');
   initParallax();
+  initEnvelopePage();
   initReveal();
   initMapPopup();
   initInvitePage(document).catch((e) => console.error(e));

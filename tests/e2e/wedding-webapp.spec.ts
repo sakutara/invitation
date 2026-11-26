@@ -37,6 +37,8 @@ test.describe('Announcement page (index.html)', () => {
   test('shows the dynamic gallery and navigates to RSVP via the Burgundy CTA', async ({ page }) => {
     await page.goto('index.html');
     await expect(page.locator('#gallery .gallery__item')).toHaveCount(7);
+    // Gallery photos are lazy and sit below the envelope scene.
+    await page.locator('#gallery img').first().scrollIntoViewIfNeeded();
     await expect(page.locator('#gallery img').first()).toHaveJSProperty('complete', true);
     const cta = page.locator('a[data-cta="rsvp"]');
     await expect(cta).toHaveCSS('background-color', 'rgb(122, 28, 36)');
@@ -47,10 +49,12 @@ test.describe('Announcement page (index.html)', () => {
   test('parallax layers translate with scroll via translate3d', async ({ page }) => {
     await page.goto('index.html');
     const layer = page.locator('#story [data-parallax-speed="-0.15"]').first();
-    await page.evaluate(() => window.scrollTo(0, 200));
+    // #story sits below the tall envelope scene: scroll relative to it.
+    const top = await page.locator('#story').evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+    await page.evaluate((y) => window.scrollTo(0, y), top - 600);
     await page.waitForTimeout(150);
     const before = await layer.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--parallax-y'));
-    await page.evaluate(() => window.scrollTo(0, 900));
+    await page.evaluate((y) => window.scrollTo(0, y), top + 100);
     await page.waitForTimeout(150);
     const after = await layer.evaluate((el) => (el as HTMLElement).style.getPropertyValue('--parallax-y'));
     expect(before).toMatch(/px$/);

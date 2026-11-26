@@ -43,6 +43,24 @@
       "entryPhone": "50183105",
       "entryRelationship": "1545696181",
       "entryAttendees": "261159171"
+    },
+    "invitation": {
+      "coverEyebrow": "Thư mời hạnh phúc từ",
+      "openHint": "Cuộn xuống để mở thiệp",
+      "cardEyebrow": "Save the date",
+      "monogram": "",
+      "momentLine": "Khoảnh khắc ấy đã đến…",
+      "scriptHeadline": "Chúng mình về chung một nhà",
+      "joinLine": "Trân trọng kính mời",
+      "place": "",
+      "calendarTitle": "Ngày chung đôi",
+      "countdownTitle": "Hẹn gặp bạn trong ngày vui",
+      "countdownDoneText": "Cảm ơn bạn đã cùng chung vui",
+      "rsvpTitle": "Bạn sẽ đến chung vui chứ?",
+      "rsvpNote": "Mong bạn xác nhận tham dự để chúng mình chuẩn bị chu đáo nhất.",
+      "closingTitle": "Thân thương",
+      "closingNote": "Mọi thắc mắc xin liên hệ cô dâu & chú rể",
+      "contact": ""
     }
   },
   "photos": [
@@ -539,5 +557,5 @@
       }
     ]
   },
-  "builtAt": "2026-11-24T17:19:07.816Z"
+  "builtAt": "2026-11-26T17:17:25.971Z"
 }

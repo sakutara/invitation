@@ -56,6 +56,7 @@ function render(config) {
       eventSection('ceremony', 'Lễ thành hôn'),
       eventSection('reception', 'Tiệc cưới'),
     ),
+    invitationSection(),
     googleFormSection(),
     h(
       'details',
@@ -76,6 +77,34 @@ function render(config) {
     ),
   );
   for (const key of EVENTS) paintPreview(key);
+}
+
+// Wording of the scroll-driven envelope invitation (invite.html). Empty = default / auto value.
+const INVITATION_FIELDS = [
+  ['coverEyebrow', 'Dòng trên tên (phong bì đóng)'],
+  ['openHint', 'Gợi ý mở thiệp'],
+  ['cardEyebrow', 'Dòng đầu thiệp trong phong bì'],
+  ['monogram', 'Chữ lồng trên con dấu sáp', 'Để trống = chữ cái đầu tên (vd. T&C)'],
+  ['momentLine', 'Câu dẫn'],
+  ['scriptHeadline', 'Câu chữ viết tay'],
+  ['joinLine', 'Câu mời'],
+  ['place', 'Nơi tổ chức (thành phố)', 'Để trống = phần cuối địa chỉ tiệc cưới'],
+  ['calendarTitle', 'Tiêu đề lịch'],
+  ['countdownTitle', 'Câu dưới đồng hồ đếm ngược'],
+  ['countdownDoneText', 'Câu khi đã tới ngày cưới'],
+  ['rsvpTitle', 'Tiêu đề xác nhận tham dự'],
+  ['rsvpNote', 'Ghi chú xác nhận', 'Vd. Vui lòng phản hồi trước ngày 01/01/2027'],
+  ['closingTitle', 'Lời kết'],
+  ['closingNote', 'Ghi chú cuối thiệp'],
+  ['contact', 'Liên hệ', 'Không bắt buộc · số điện thoại hoặc email'],
+];
+
+function invitationSection() {
+  const fieldsFor = (list) => list.map(([k, label, hint]) => f(`invitation.${k}`, label, { hint }));
+  const all = fieldsFor(INVITATION_FIELDS);
+  const rows = [];
+  for (let i = 0; i < all.length; i += 2) rows.push(row(...all.slice(i, i + 2)));
+  return section('Thiệp mời (trang phong bì)', h('p', { class: 'hint mb-2' }, 'Chữ hiển thị trên thiệp mời dạng phong bì mở khi cuộn. Ảnh trong phong bì lấy từ mục Ảnh cưới: "Ảnh chân dung trên thiệp" (nếu chưa có thì dùng "Ảnh bìa trang chủ"); nền đếm ngược dùng ảnh "Câu chuyện"; nền xác nhận dùng ảnh "Nền trang đăng ký".'), ...rows);
 }
 
 const FORM_ENTRIES = [
@@ -223,6 +252,7 @@ function collect() {
     googleMapsEmbedUrl: v('googleMapsEmbedUrl'),
     siteBaseUrl: v('siteBaseUrl'),
     rsvpWebhookUrl: v('rsvpWebhookUrl'),
+    invitation: Object.fromEntries(INVITATION_FIELDS.map(([k]) => [k, v(`invitation.${k}`)])),
     rsvpForm: {
       formId: parseFormId(v('rsvpForm.formId')),
       entryFullName: v('rsvpForm.entryFullName'),
