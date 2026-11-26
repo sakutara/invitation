@@ -31,21 +31,26 @@ describe('invite.html template', () => {
     expect(q('script[src="assets/js/invite.js"]')).not.toBeNull();
   });
 
-  it('server-renders the fallback greeting for no-JS visitors', () => {
-    expect(text('[data-role="greeting"]')).toBe('Kính mời bạn đến chung vui cùng gia đình chúng tôi, sự hiện diện của bạn là niềm vinh hạnh cho gia đình.');
+  it('server-renders the default card wording for no-JS visitors', () => {
+    expect(text('.paper-card--main [data-role="guest-name"]')).toBe('Quý khách');
+    expect(q('[data-role="presence"]').textContent).toBe('Sự hiện diện của Quý vị\nlà niềm vinh hạnh cho gia đình chúng tôi!');
   });
 
-  it('shows event details, the static map image and the Google Maps link', () => {
-    const body = document.body.textContent!;
-    expect(body).toContain(DEFAULT_CONFIG.reception.venueName);
-    expect(body).toContain(DEFAULT_CONFIG.reception.address);
-    expect(q<HTMLImageElement>('[data-role="static-map"] img').getAttribute('src')).toBe('assets/images/map/map-md.jpg');
-    expect(q(`a[data-role="google-maps"][href="${DEFAULT_CONFIG.googleMapsUrl}"]`)).not.toBeNull();
+  it('shows both printed cards: party (venue, time, lunar date, families) and ceremony', () => {
+    const main = text('.paper-card--main');
+    for (const s of [DEFAULT_CONFIG.reception.venueName, DEFAULT_CONFIG.reception.address, 'Vào lúc', '16.01.2027', 'Tức ngày 9 tháng 12 năm Bính Ngọ', DEFAULT_CONFIG.groomParents.father, DEFAULT_CONFIG.brideParents.mother])
+      expect(main, s).toContain(s);
+    const ceremony = text('.paper-card--ceremony');
+    for (const s of [DEFAULT_CONFIG.ceremony.title, DEFAULT_CONFIG.ceremony.venueName, 'Rất hân hạnh được đón tiếp!']) expect(ceremony, s).toContain(s);
+    expect(text('.pc-wreath__mono')).toBe('QH');
   });
 
-  it('falls back to an illustrated map when no static map photo exists', () => {
-    mount([]);
-    expect(q('[data-role="static-map"] svg')).not.toBeNull();
+  it('has no directions or RSVP section (the guest already replied), but a full schedule with Google Maps', () => {
+    expect(q('#directions')).toBeNull();
+    expect(q('#rsvp-cta')).toBeNull();
+    const events = text('#events');
+    for (const s of [DEFAULT_CONFIG.ceremony.address, DEFAULT_CONFIG.reception.venueName, DEFAULT_CONFIG.reception.address]) expect(events, s).toContain(s);
+    expect(q(`#events a[href="${DEFAULT_CONFIG.googleMapsUrl}"]`)).not.toBeNull();
   });
 
   it('has parallax layers and save/share controls', () => {
@@ -62,7 +67,8 @@ describe('initInvitePage', () => {
 
   it('personalizes greeting + highlights ZONE_B1 with 2 seats for ?khach=<slug>', async () => {
     await initInvitePage(document, { search: `?khach=${SLUG}`, fetchJson: fetchMap });
-    expect(text('[data-role="greeting"]')).toBe(SENTENCE);
+    for (const el of document.querySelectorAll('[data-role="guest-name"]')) expect(el.textContent).toBe('vợ chồng chú Chín');
+    expect(q('[data-role="presence"]').textContent).toBe('Sự hiện diện của chú thím\nlà niềm vinh hạnh cho gia đình chúng tôi!');
     expect(q('.seating__map [data-zone="ZONE_B1"]').getAttribute('data-highlight')).toBe('true');
     expect(document.querySelectorAll('.seating__map [data-highlight="true"]')).toHaveLength(1);
     expect(text('[data-role="seat-count"]')).toBe('2');
@@ -77,12 +83,13 @@ describe('initInvitePage', () => {
   it('reads the guest from the DB-built guests-map.json', async () => {
     await initInvitePage(document, { search: `?khach=${SLUG}`, fetchJson: fetchMap });
     expect(fetchMap).toHaveBeenCalledWith('assets/data/guests-map.json');
-    expect(text('[data-role="greeting"]')).toBe(SENTENCE);
+    expect(text('.paper-card--main [data-role="guest-name"]')).toBe('vợ chồng chú Chín');
   });
 
   it.each(['', '?khach=khong-ton-tai', '?g=invalid'])('shows the default invitation with the plain map and no table guidance for %j', async (search) => {
     await initInvitePage(document, { search, fetchJson: fetchMap });
-    expect(text('[data-role="greeting"]')).toContain('Kính mời bạn đến chung vui');
+    expect(text('.paper-card--main [data-role="guest-name"]')).toBe('Quý khách');
+    expect(q('[data-role="presence"]').textContent).toContain('Quý vị');
     expect(document.querySelector('.seating__map svg')).not.toBeNull();
     expect(document.querySelectorAll('.seating__map [data-highlight="true"]')).toHaveLength(0);
     expect(q('.seating__info').hidden).toBe(true);

@@ -1,10 +1,10 @@
 /** Shared HTML partials for the three static pages. */
+import { floralPaths } from '../../shared/florals';
+import { FONTS_HREF } from '../../shared/web-fonts';
 import { escapeHtml } from '../../shared/html';
 import { formatViDateTime } from '../../shared/date-format';
 import type { EventDetails, ImageVariant, PhotoRecord, WeddingConfig } from '../../shared/types';
 
-const FONTS_HREF =
-  'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Great+Vibes&display=swap&subset=vietnamese';
 
 export function documentShell(opts: {
   config: WeddingConfig;
@@ -76,20 +76,35 @@ export function firstPhoto(photos: PhotoRecord[], ...placements: PhotoRecord['pl
 }
 
 /** Botanical corner ornament (foreground parallax layer). */
+/** Watercolour-style floral spray (shared with the JPG card, see shared/florals.ts). */
+const FLIP = { none: '', h: 'matrix(-1 0 0 1 220 0)', v: 'matrix(1 0 0 -1 0 220)', both: 'matrix(-1 0 0 -1 220 220)' };
+
+/** `flip` mirrors the spray inside its box (h: grows from the bottom-right, v: from the top-left, both: top-right). */
+export function floralSpray(cls = '', attrs = '', flip: keyof typeof FLIP = 'none'): string {
+  const inner = FLIP[flip] ? `<g transform="${FLIP[flip]}">${floralPaths()}</g>` : floralPaths();
+  return `<svg class="floral ${cls}"${attrs} viewBox="0 0 220 220" fill="none" aria-hidden="true">${inner}</svg>`;
+}
+
+/** Corner florals; kept under the parallax ornament contract (data-parallax-speed="-0.15"). */
 export function ornament(position: 'tl' | 'br'): string {
-  return `<svg class="parallax__ornament parallax__ornament--${position}" data-parallax-speed="-0.15" viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-<path d="M6 114 C6 60 30 22 114 6"/><path d="M20 112 C22 74 44 44 92 22"/>
-<path d="M30 70 c-10-6-14-18-10-26 c10 4 14 16 10 26z" fill="currentColor" fill-opacity=".18"/>
-<path d="M52 44 c-4-12 0-22 8-26 c4 10 0 22-8 26z" fill="currentColor" fill-opacity=".18"/>
-<path d="M70 30 c10-6 22-4 28 2 c-8 8-20 8-28-2z" fill="currentColor" fill-opacity=".18"/>
-<circle cx="14" cy="96" r="4" fill="currentColor"/><circle cx="96" cy="14" r="4" fill="currentColor"/></svg>`;
+  return floralSpray(`parallax__ornament parallax__ornament--${position}`, ' data-parallax-speed="-0.15"', position === 'tl' ? 'v' : 'h');
 }
 
 /** Small revealing script tag removing .no-js early. */
 export const NO_JS_SWAP = `<script>document.documentElement.classList.remove('no-js')</script>`;
 
-export function eventCard(e: EventDetails, mapsUrl: string): string {
+/** `compact` (index.html): only time, date and city, no venue or map. */
+export function eventCard(e: EventDetails, mapsUrl: string, opts: { compact?: boolean } = {}): string {
   const f = formatViDateTime(e.datetime);
+  if (opts.compact) {
+    const city = e.address.split(',').pop()?.trim() ?? '';
+    return `<article class="card event event--compact">
+  <span class="eyebrow">${escapeHtml(e.title)}</span>
+  <p class="event__time">${escapeHtml(f.time)}</p>
+  <p class="event__date">${escapeHtml(`${f.weekday}, ${f.date}`)}</p>
+  ${city ? `<hr class="divider">\n  <p class="event__city">${escapeHtml(city)}</p>` : ''}
+</article>`;
+  }
   const href = escapeHtml(e.mapsUrl || mapsUrl);
   const venue = escapeHtml(e.venueName);
   // Without JS the link opens Google Maps; with the map-popup script the click opens a larger zoomable map instead.
@@ -97,7 +112,7 @@ export function eventCard(e: EventDetails, mapsUrl: string): string {
   const map = e.mapPreviewSrc
     ? `<a class="event__map" href="${href}" target="_blank" rel="noopener" aria-label="Xem bản đồ đến ${venue}" data-map-popup data-map-large="${largeSrc}" data-maps-url="${href}" data-map-title="${venue}" data-map-address="${escapeHtml(e.address)}"><img src="${escapeHtml(e.mapPreviewSrc)}" alt="Bản đồ đến ${venue}" width="800" height="400" loading="lazy" decoding="async"></a>\n  `
     : '';
-  return `<article class="card event reveal">
+  return `<article class="card event">
   <span class="eyebrow">${escapeHtml(e.title)}</span>
   <p class="event__time">${escapeHtml(f.time)}</p>
   <p class="event__date">${escapeHtml(`${f.weekday}, ${f.date}`)}</p>

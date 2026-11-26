@@ -6,6 +6,7 @@ import { createCms } from '../src/backend/cms';
 import { processImage } from '../src/backend/image-processor';
 import { computeShortId, encodeGuestToken } from '../src/shared/guest-codec';
 import { PROJECT_ROOT } from '../src/backend/static-builder';
+import { DEFAULT_CONFIG } from '../src/shared/default-config';
 import type { PhotoPlacement } from '../src/shared/types';
 
 export const E2E_WEBHOOK = 'https://script.google.com/macros/s/E2E-TEST/exec';
@@ -25,7 +26,8 @@ export async function buildE2eSite(): Promise<{ shortId: string; slug: string }>
   await rm(E2E_DIST, { recursive: true, force: true });
   await mkdir(E2E_DIR, { recursive: true });
   const cms = await createCms({ dbPath: join(E2E_DIR, 'wedding.db'), distDir: E2E_DIST, mediaDir: join(E2E_DIR, 'media'), debounceMs: 5 });
-  cms.db.setConfig({ rsvpWebhookUrl: E2E_WEBHOOK, siteBaseUrl: 'https://cuoi.example.com', googleMapsEmbedUrl: '' });
+  // A configured Google Form wins over the webhook: blank its ID so the RSVP test hits the mocked webhook.
+  cms.db.setConfig({ rsvpWebhookUrl: E2E_WEBHOOK, rsvpForm: { ...DEFAULT_CONFIG.rsvpForm, formId: '' }, siteBaseUrl: 'https://cuoi.example.com', googleMapsEmbedUrl: '' });
   const plan: [PhotoPlacement, number, number, string][] = [
     ['hero', 2400, 1600, 'Hero'],
     ['rsvp_background', 2400, 1600, 'RSVP'],

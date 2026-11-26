@@ -27,6 +27,16 @@ export function normalizeName(input: unknown): string {
   return cleanText(input) || FALLBACK_GUEST.name;
 }
 
+/** Name on the dotted line of the printed-style card ("Quý khách" for the default invitation). */
+export function guestNameLine(guest: { name?: string } | null | undefined): string {
+  return guest ? normalizeName(guest.name) : 'Quý khách';
+}
+
+/** Fills {khach} in the presence line with the guest's salutation ("Quý vị" for the default invitation). */
+export function presenceLine(template: string, guest: { salutation?: string } | null | undefined): string {
+  return template.replace(/\{khach\}/g, guest ? normalizeSalutation(guest.salutation) : 'Quý vị');
+}
+
 export function formatInvitation(guest: { salutation?: string; name?: string } | null | undefined): string {
   const name = normalizeName(guest?.name);
   const salutation = normalizeSalutation(guest?.salutation);

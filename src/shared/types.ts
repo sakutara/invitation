@@ -175,13 +175,21 @@ export interface InvitationContent {
   coverEyebrow: string;
   /** Hint under the wax seal telling guests to scroll. */
   openHint: string;
-  /** Line at the top of the card that slides out of the envelope. */
-  cardEyebrow: string;
+  /** Script title in the arch of the card that slides out of the envelope. */
+  archTitle: string;
+  /** Same title on the announcement page (index.html). */
+  announceArchTitle: string;
   /** Monogram on the wax seal and closing card; empty = initials of the given names. */
   monogram: string;
   momentLine: string;
   scriptHeadline: string;
   joinLine: string;
+  /** Uppercase lines under the guest name on the invitation card. */
+  inviteLine: string;
+  /** Script line on the invitation card; {khach} = the guest's salutation ("Quý vị" by default). */
+  presenceLine: string;
+  /** Script line at the bottom of the ceremony card. */
+  ceremonyWelcome: string;
   /** City / place shown under the invitation; empty = last part of the reception address. */
   place: string;
   calendarTitle: string;

@@ -77,9 +77,9 @@ describe('map preview (offline fallback)', () => {
     await cms.whenIdle();
     expect(existsSync(join(root, 'dist/assets/maps', body.mapPreviewSrc.split('/').pop()!))).toBe(true);
     expect(existsSync(join(root, 'dist/assets/maps', body.mapPreviewLargeSrc.split('/').pop()!))).toBe(true);
-
-    const html = distIndex();
-    expect(html).toMatch(/<a class="event__map"[^>]*data-map-popup[^>]*data-map-large="assets\/maps\/reception-[0-9a-f]{8}-lg\.jpg"[^>]*>\s*<img src="assets\/maps\/reception-[0-9a-f]{8}\.jpg"[^>]*>\s*<\/a>\s*<a class="btn btn--ghost" href="https:\/\/maps\.app\.goo\.gl\/abc"/);
+    // The previews are shown in the schedule of invite.html (index.html lists only the day and the city).
+    const invite = readFileSync(join(root, 'dist/invite.html'), 'utf8');
+    expect(invite).toMatch(/<a class="event__map"[^>]*data-map-popup[^>]*data-map-large="assets\/maps\/reception-[0-9a-f]{8}-lg\.jpg"[^>]*>\s*<img src="assets\/maps\/reception-[0-9a-f]{8}\.jpg"[^>]*>\s*<\/a>\s*<a class="btn btn--ghost" href="https:\/\/maps\.app\.goo\.gl\/abc"/);
   });
 
   it('rejects an unknown event with 400', async () => {

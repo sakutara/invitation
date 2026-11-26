@@ -1,8 +1,9 @@
 /** Personalized invitation: URL decoding, greeting, seating highlight, and 1080x1620 JPEG save/share. */
 import { resolveGuestFromLocation, buildInviteUrl, GUEST_PARAM, type GuestsMap } from '../../shared/guest-codec';
-import { formatInvitation } from '../../shared/invitation-formatter';
+import { formatInvitation, guestNameLine, presenceLine } from '../../shared/invitation-formatter';
 import { mapSeating, renderSeatingMapSvg } from '../../shared/seating-mapper';
 import { renderCardSvg } from '../../shared/card-svg-template';
+import { embeddedFontCss, withFontCss } from '../../shared/web-fonts';
 import { slugify } from '../../shared/slug';
 import { CARD_SPEC, FALLBACK_GUEST, RELATIONSHIP_GROUPS, type GuestInvitePayload, type PhotoRecord, type SeatingLayout, type SeatingZone, type WeddingConfig } from '../../shared/types';
 import { initParallax } from './parallax';
@@ -27,8 +28,9 @@ export interface InviteOptions {
   fetchJson?: (url: string) => Promise<GuestsMap>;
   renderCard?: (svg: string) => Promise<Blob>;
   saveOrShare?: typeof saveOrShare;
-  loadDataUrl?: (url: string) => Promise<string>;
   nav?: Navigator;
+  /** Resolves the @font-face CSS to inline into the card SVG (the page boot passes embeddedFontCss). */
+  fontCss?: () => Promise<string>;
 }
 
 export function cardFileNameFor(g: { name: string }): string {
@@ -99,16 +101,6 @@ async function defaultFetchJson(url: string): Promise<GuestsMap> {
   return res.json();
 }
 
-async function defaultLoadDataUrl(url: string): Promise<string> {
-  const blob = await (await fetch(url)).blob();
-  return new Promise((resolve, reject) => {
-    const r = new FileReader();
-    r.onload = () => resolve(String(r.result));
-    r.onerror = () => reject(r.error);
-    r.readAsDataURL(blob);
-  });
-}
-
 function inviteUrlFor(config: WeddingConfig, search: string, win?: Window): string {
   const base = win?.location?.origin?.startsWith('http') ? win.location.href.replace(/[?#].*$/, '').replace(/\/[^/]*$/, '') : config.siteBaseUrl;
   const slug = new URLSearchParams(search).get(GUEST_PARAM);
@@ -131,7 +123,11 @@ export async function initInvitePage(doc: Document = document, opts: InviteOptio
     if (el) el.textContent = value;
   };
 
-  set('greeting', formatInvitation(guest));
+  // Printed-style card: guest name on the dotted line, salutation in the presence line.
+  const nameLine = guestNameLine(known);
+  doc.querySelectorAll('[data-role="guest-name"]').forEach((el) => { el.textContent = nameLine; });
+  const presence = doc.querySelector<HTMLElement>('[data-role="presence"]');
+  if (presence?.dataset.template) presence.textContent = presenceLine(presence.dataset.template, known);
   const badge = doc.querySelector<HTMLElement>('[data-role="guest-badge"]');
   if (badge) {
     badge.hidden = !known;
@@ -157,26 +153,13 @@ export async function initInvitePage(doc: Document = document, opts: InviteOptio
   }
 
   const inviteUrl = inviteUrlFor(config, search, doc.defaultView ?? undefined);
-  let cardSvg = renderCardSvg({ config, zones: seatingZones, guest: known, inviteUrl, layout });
+  const cardSvg = renderCardSvg({ config, zones: seatingZones, guest: known, inviteUrl, layout });
   const preview = doc.querySelector<HTMLImageElement>('.save-card__preview img');
   if (preview) preview.src = svgToDataUrl(cardSvg);
 
-  const portrait = data.photos.find((p) => p.placement === 'invite_portrait') ?? data.photos.find((p) => p.placement === 'hero');
-  const portraitSrc = portrait?.variants.find((v) => v.tier === 'sm' && v.format === 'jpg')?.src;
-  // Card background = the home-page hero photo.
-  const hero = data.photos.find((p) => p.placement === 'hero') ?? data.photos.find((p) => p.placement === 'gallery');
-  const heroSrc = (hero?.variants.find((v) => v.tier === 'md' && v.format === 'jpg') ?? hero?.variants.find((v) => v.format === 'jpg'))?.src;
-  const load = opts.loadDataUrl ?? defaultLoadDataUrl;
-  let portraitHref: string | null = null;
-  let backgroundHref: string | null = null;
-  const redraw = () => {
-    cardSvg = renderCardSvg({ config, zones: seatingZones, guest: known, inviteUrl, portraitHref, backgroundHref, layout });
-    if (preview) preview.src = svgToDataUrl(cardSvg);
-  };
-  const portraitReady = Promise.all([
-    portraitSrc ? load(portraitSrc).then((h) => { portraitHref = h; }).catch(() => {}) : Promise.resolve(),
-    heroSrc ? load(heroSrc).then((h) => { backgroundHref = h; }).catch(() => {}) : Promise.resolve(),
-  ]).then(() => { if (portraitHref || backgroundHref) redraw(); });
+  // The card is pure vector; only the web fonts have to be inlined before it is rasterized.
+  const fontsReady = (opts.fontCss?.() ?? Promise.resolve('')).catch(() => '');
+  void fontsReady.then((css) => { if (css && preview) preview.src = svgToDataUrl(withFontCss(cardSvg, css)); });
 
   const status = doc.querySelector<HTMLElement>('.save-card__status');
   const renderCard = opts.renderCard ?? ((svg: string) => renderCardJpegBlob(svg, doc));
@@ -187,8 +170,7 @@ export async function initInvitePage(doc: Document = document, opts: InviteOptio
     btn.disabled = true;
     if (status) status.textContent = 'Đang tạo ảnh thiệp…';
     try {
-      await portraitReady;
-      const blob = await renderCard(cardSvg);
+      const blob = await renderCard(withFontCss(cardSvg, await fontsReady));
       const result = await save(blob, fileName, {
         mode,
         nav: opts.nav,
@@ -215,5 +197,5 @@ if (typeof document !== 'undefined' && document.body?.classList.contains('page-i
   initEnvelopePage();
   initReveal();
   initMapPopup();
-  initInvitePage(document).catch((e) => console.error(e));
+  initInvitePage(document, { fontCss: () => embeddedFontCss() }).catch((e) => console.error(e));
 }

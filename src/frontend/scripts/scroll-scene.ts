@@ -15,9 +15,9 @@ export const ENVELOPE_PHASES: Record<string, [number, number]> = {
   cover: [0.0, 0.2], // closed envelope cover lifts away
   stage: [0.1, 0.26], // envelope settles in the middle of the ivory page
   flap: [0.26, 0.44], // flap swings open
-  card: [0.44, 0.72], // photo + save-the-date slide out
-  fan: [0.66, 0.84], // photo and card fan apart
-  caption: [0.8, 0.96], // caption under the envelope
+  card: [0.44, 0.64], // the invitation card rises out of the pocket
+  fan: [0.66, 0.86], // ...then comes forward over the envelope and grows
+  caption: [0.84, 0.98], // caption under the envelope
 };
 
 /** Progress of a sticky scene: 0 when its top reaches the viewport top, 1 when its bottom reaches the viewport bottom. */
@@ -55,7 +55,10 @@ export function initScrollScenes(root: ParentNode = document, win: Window = wind
       const p = reduced ? 1 : sceneProgress(r.top, r.height, vh);
       scene.style.setProperty('--scene', String(round(p)));
       for (const [k, v] of Object.entries(phaseValues(p))) scene.style.setProperty(`--${k}`, String(round(v)));
-      scene.classList.toggle('is-open', reduced || phaseValues(p).flap > 0.5);
+      const v = phaseValues(p);
+      scene.classList.toggle('is-open', reduced || v.flap > 0.5);
+      // Once fully out of the pocket the card is drawn in front of the envelope.
+      scene.classList.toggle('is-out', reduced || v.card >= 0.999);
       scene.classList.toggle('is-done', p >= 0.999);
     }
     for (const el of tracked) {

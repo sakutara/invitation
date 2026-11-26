@@ -83,11 +83,15 @@ function render(config) {
 const INVITATION_FIELDS = [
   ['coverEyebrow', 'Dòng trên tên (phong bì đóng)'],
   ['openHint', 'Gợi ý mở thiệp'],
-  ['cardEyebrow', 'Dòng đầu thiệp trong phong bì'],
+  ['archTitle', 'Tiêu đề trong vòm ảnh · trang thiệp mời'],
+  ['announceArchTitle', 'Tiêu đề trong vòm ảnh · trang báo hỉ'],
   ['monogram', 'Chữ lồng trên con dấu sáp', 'Để trống = chữ cái đầu tên (vd. T&C)'],
   ['momentLine', 'Câu dẫn'],
   ['scriptHeadline', 'Câu chữ viết tay'],
   ['joinLine', 'Câu mời'],
+  ['inviteLine', 'Lời mời dưới tên khách', 'Xuống dòng bằng Enter'],
+  ['presenceLine', 'Câu viết tay trên thiệp', '{khach} = cách xưng hô với khách (mặc định Quý vị)'],
+  ['ceremonyWelcome', 'Câu cuối thiệp lễ thành hôn'],
   ['place', 'Nơi tổ chức (thành phố)', 'Để trống = phần cuối địa chỉ tiệc cưới'],
   ['calendarTitle', 'Tiêu đề lịch'],
   ['countdownTitle', 'Câu dưới đồng hồ đếm ngược'],
@@ -100,7 +104,8 @@ const INVITATION_FIELDS = [
 ];
 
 function invitationSection() {
-  const fieldsFor = (list) => list.map(([k, label, hint]) => f(`invitation.${k}`, label, { hint }));
+  const MULTILINE = new Set(['inviteLine', 'presenceLine']);
+  const fieldsFor = (list) => list.map(([k, label, hint]) => f(`invitation.${k}`, label, { hint, multiline: MULTILINE.has(k) }));
   const all = fieldsFor(INVITATION_FIELDS);
   const rows = [];
   for (let i = 0; i < all.length; i += 2) rows.push(row(...all.slice(i, i + 2)));

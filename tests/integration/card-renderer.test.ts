@@ -40,23 +40,23 @@ describe('renderCardSvg (shared master template)', () => {
     expect(svg).toContain('viewBox="0 0 1080 1620"');
   });
 
-  it('contains all mandatory visual blocks', () => {
-    expect(text).toContain(DEFAULT_CONFIG.groomName);
-    expect(text).toContain(DEFAULT_CONFIG.brideName);
-    expect(text).toContain('16/01/2027');
-    expect(text).toContain(SENTENCE);
-    expect(text).toContain(DEFAULT_CONFIG.reception.venueName);
-    expect(text).toContain(DEFAULT_CONFIG.reception.address);
-    expect(text).toContain(formatViDateTime(DEFAULT_CONFIG.ceremony.datetime).time);
-    expect(svg).toContain('data-role="portrait"');
+  it('follows the printed card: guest on the dotted line, couple, venue, time table, lunar date, families', () => {
+    for (const s of [
+      'TRÂN TRỌNG KÍNH MỜI', 'vợ chồng chú Chín', 'TỚI DỰ BỮA CƠM THÂN MẬT MỪNG LỄ THÀNH HÔN', DEFAULT_CONFIG.groomName, DEFAULT_CONFIG.brideName,
+      'ĐƯỢC TỔ CHỨC TẠI', DEFAULT_CONFIG.reception.address, 'VÀO LÚC', formatViDateTime(DEFAULT_CONFIG.reception.datetime).time,
+      'THỨ BẢY', '16.01.2027', 'Tức ngày 9 tháng 12 năm Bính Ngọ', 'Sự hiện diện của chú thím', 'Nhà Trai:', 'Nhà Gái:',
+      DEFAULT_CONFIG.groomParents.father.toUpperCase(), DEFAULT_CONFIG.brideParents.mother.toUpperCase(),
+    ]) expect(text.replace(/\s+/g, ' '), s).toContain(s);
     expect(svg).toContain('data-role="qr"');
-    expect(svg).toMatch(/data-zone="ZONE_B1"[^>]*data-highlight="true"/);
-    expect(svg).toContain('#EC4899');
+    expect(svg).toContain('#3F5F7B'); // dusty-blue folder
+    expect(svg).toContain('#6B1A34'); // wine script
     expect(text).toContain('2 chỗ');
   });
 
-  it('falls back to the default greeting for missing guest data', () => {
-    expect(svgTextContent(renderCardSvg({ ...INPUT, guest: null }))).toContain('Kính mời bạn đến chung vui');
+  it('addresses a guest-less card to "Quý khách" / "Quý vị"', () => {
+    const t = svgTextContent(renderCardSvg({ ...INPUT, guest: null }));
+    expect(t).toContain('Quý khách');
+    expect(t).toContain('Sự hiện diện của Quý vị');
   });
 
   it('escapes user-provided text', () => {
@@ -66,29 +66,16 @@ describe('renderCardSvg (shared master template)', () => {
 });
 
 describe('renderCardJpeg', () => {
-  it('produces a valid 1080x1620 JPEG with the Lotus Pink zone highlight', async () => {
+  it('produces a valid 1080x1620 JPEG: ivory card on the dusty-blue folder', async () => {
     const buf = await renderCardJpeg(INPUT);
     expect([...buf.subarray(0, 3)]).toEqual([0xff, 0xd8, 0xff]);
     const meta = await sharp(buf).metadata();
     expect([meta.format, meta.width, meta.height]).toEqual(['jpeg', 1080, 1620]);
     const { data, info } = await sharp(buf).raw().toBuffer({ resolveWithObject: true });
-    let pink = 0;
-    for (let i = 0; i < data.length; i += info.channels) {
-      if (Math.abs(data[i] - 0xec) < 20 && Math.abs(data[i + 1] - 0x48) < 25 && Math.abs(data[i + 2] - 0x99) < 25) pink++;
-    }
-    expect(pink).toBeGreaterThan(500);
-  });
-
-  it('embeds a portrait image when provided', async () => {
-    const portrait = await sharp({ create: { width: 400, height: 500, channels: 3, background: '#00ff00' } }).jpeg().toBuffer();
-    const svg = renderCardSvg({ ...INPUT, portraitHref: `data:image/jpeg;base64,${portrait.toString('base64')}` });
-    expect(svg).toContain('<image');
-    const { data, info } = await sharp(await renderCardJpeg({ ...INPUT, portraitHref: `data:image/jpeg;base64,${portrait.toString('base64')}` }))
-      .raw()
-      .toBuffer({ resolveWithObject: true });
-    let green = 0;
-    for (let i = 0; i < data.length; i += info.channels) if (data[i + 1] > 200 && data[i] < 60) green++;
-    expect(green).toBeGreaterThan(10_000);
+    const px = (x: number, y: number) => [...data.subarray((y * info.width + x) * info.channels, (y * info.width + x) * info.channels + 3)];
+    const near = (a: number[], b: number[]) => a.every((v, i) => Math.abs(v - b[i]) < 24);
+    expect(near(px(540, 20), [0x3f, 0x5f, 0x7b])).toBe(true); // folder above the card
+    expect(near(px(160, 700), [0xf4, 0xf4, 0xee])).toBe(true); // card paper
   });
 });
 
@@ -98,10 +85,8 @@ describe('generateCards (bulk)', () => {
     expect(cardFileName({ rowId: 'R/3', shortId: 'abcdef', name: 'Đặng Thị Ánh' })).toBe('R-3_abcdef_dang-thi-anh.jpg');
   });
 
-  it('draws the hero photo as the card background when provided', () => {
-    const bg = 'data:image/jpeg;base64,/9j/4AAQ';
-    expect(renderCardSvg({ ...INPUT, backgroundHref: bg })).toContain('data-role="background"');
-    expect(renderCardSvg(INPUT)).not.toContain('data-role="background"');
+  it('is vector only (no photos to fetch before saving)', () => {
+    expect(renderCardSvg(INPUT)).not.toContain('<image');
   });
 
   it('omits table guidance (but keeps the map) when there is no guest', () => {

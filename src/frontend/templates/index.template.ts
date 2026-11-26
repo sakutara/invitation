@@ -2,9 +2,9 @@
 import { escapeHtml } from '../../shared/html';
 import { formatViDateTime } from '../../shared/date-format';
 import type { WeddingData } from '../../shared/types';
+import { documentShell, firstPhoto, ornament, picture, variant } from './partials';
+import { calendarSection, closingSection, countdownSection, dayTicket, envelopeScene, rsvpCtaSection, sheet, waxSeal } from './envelope.partials';
 import { resolveInvitation } from '../../shared/default-config';
-import { documentShell, eventCard, firstPhoto, ornament, picture, variant } from './partials';
-import { calendarSection, closingSection, countdownSection, envelopeScene, rsvpCtaSection } from './envelope.partials';
 
 type PageData = Omit<WeddingData, 'guests'> & { builtAt?: string };
 
@@ -16,15 +16,17 @@ export function renderIndexPage(data: PageData): string {
   const wedding = formatViDateTime(config.reception.datetime || config.ceremony.datetime);
   const heroImg = hero ? variant(hero, 'lg') : undefined;
   const inv = resolveInvitation(config);
+  /** Scattered prints settle as they enter (deterministic tilt per position). */
+  const TILTS = [-6, 4, -3, 7, -5, 3, -2, 5];
 
   const galleryHtml = gallery.length
     ? `<div class="gallery">${gallery
-        .map((p) => {
+        .map((p, i) => {
           const sm = variant(p, 'sm');
           const portrait = sm ? sm.height > sm.width : false;
           // Frame takes the real ratio of the stored crop, so object-fit never trims the admin's framing.
-          const ratio = sm ? ` style="aspect-ratio: ${sm.width} / ${sm.height}"` : '';
-          return `<figure class="gallery__item reveal${portrait ? ' gallery__item--portrait' : ''}"${ratio}>${picture(p, {
+          const ratio = sm ? ` style="aspect-ratio: ${sm.width} / ${sm.height}; --r: ${TILTS[i % TILTS.length]}deg"` : ` style="--r: ${TILTS[i % TILTS.length]}deg"`;
+          return `<figure class="gallery__item${portrait ? ' gallery__item--portrait' : ''}"${ratio} data-scroll-progress data-scroll-span="0.6">${picture(p, {
             sizes: '(max-width: 560px) 100vw, (max-width: 1200px) 50vw, 33vw',
           })}${p.caption ? `<figcaption>${escapeHtml(p.caption)}</figcaption>` : ''}</figure>`;
         })
@@ -33,79 +35,68 @@ export function renderIndexPage(data: PageData): string {
 
   const body = `
 <main>
-${envelopeScene(config, photos)}
-  <section id="hero" class="section parallax hero">
-    <div class="parallax__layer${hero ? '' : ' hero__fallback-bg'}" data-parallax-speed="0.25">${
-      heroImg ? `<img src="${escapeHtml(heroImg.src)}" alt="" fetchpriority="high" width="${heroImg.width}" height="${heroImg.height}">` : ''
-    }</div>
-    ${ornament('tl')}${ornament('br')}
-    <div class="container" data-parallax-speed="0">
-      <div class="hero__letter" data-scroll-progress data-scroll-span="0.9">
-        <span class="eyebrow hero__eyebrow rise" style="--d:0">${escapeHtml(inv.momentLine)}</span>
-        <p class="hero__script script rise" style="--d:.08">${escapeHtml(inv.scriptHeadline)}</p>
-        <h2 class="hero__names rise" style="--d:.16">${escapeHtml(config.groomName)}<span class="hero__amp">&amp;</span>${escapeHtml(config.brideName)}</h2>
-        <p class="hero__date rise" style="--d:.26">${escapeHtml(`${wedding.weekday} · ${wedding.date}`)}</p>
-        <p class="hero__headline rise" style="--d:.32">${escapeHtml(config.headline)}</p>
-        <div class="hero__actions rise" style="--d:.4">
-          <a class="btn" href="rsvp.html" data-cta="rsvp">Đăng ký tham dự</a>
-          <a class="btn btn--ghost" href="#schedule">Xem lịch trình</a>
+${envelopeScene(config, photos, { kind: 'announce' })}
+<div class="paper-desk">
+${sheet('hero', 'hero-sheet', `
+      ${ornament('tl')}${ornament('br')}
+      <div class="container hero-sheet__grid" data-parallax-speed="0">
+        <figure class="photo-print${hero ? '' : ' photo-print--empty'}">
+          <span class="photo-print__tape photo-print__tape--l" aria-hidden="true"></span><span class="photo-print__tape photo-print__tape--r" aria-hidden="true"></span>
+          <div class="photo-print__frame"><div class="photo-print__img${hero ? '' : ' hero__fallback-bg'}" data-parallax-speed="0.25">${
+            heroImg ? `<img src="${escapeHtml(heroImg.src)}" alt="${escapeHtml(config.groomName)} &amp; ${escapeHtml(config.brideName)}" fetchpriority="high" width="${heroImg.width}" height="${heroImg.height}">` : ''
+          }</div></div>
+        </figure>
+        <div class="hero__letter" data-scroll-progress data-scroll-span="0.9">
+          <h2 class="hero__script script rise" style="--d:.1">${escapeHtml(config.headline)}</h2>
+          <hr class="divider rise" style="--d:.18">
+          <div class="hero__actions rise" style="--d:.24">
+            <a class="btn" href="rsvp.html" data-cta="rsvp">Đăng ký tham dự</a>
+            <a class="btn btn--ghost btn--ink" href="#schedule">Xem lịch trình</a>
+          </div>
         </div>
-      </div>
-    </div>
-    <a class="hero__scroll" href="#story" aria-label="Cuộn xuống">CUỘN XUỐNG ↓</a>
-  </section>
-
-  <section id="story" class="section parallax section--cream">
-    ${storyBg ? `<div class="parallax__layer" data-parallax-speed="0.25" style="opacity:.12">${picture(storyBg, { sizes: '100vw', alt: '' })}</div>` : ''}
-    ${ornament('tl')}
-    <div class="container" data-parallax-speed="0">
-      <span class="eyebrow">Hai gia đình</span>
-      <h2 class="section-title">Trân trọng báo tin</h2>
-      <div class="families">
-        <article class="card family family--groom reveal">
-          <span class="family__side">Nhà trai</span>
-          <p class="family__parents">${escapeHtml(config.groomParents.father)}<br>${escapeHtml(config.groomParents.mother)}</p>
-          <p class="family__address">${escapeHtml(config.groomParents.address)}</p>
-          <p class="family__child">Chú rể ${escapeHtml(config.groomName)}</p>
-        </article>
-        <article class="card family family--bride reveal">
-          <span class="family__side">Nhà gái</span>
-          <p class="family__parents">${escapeHtml(config.brideParents.father)}<br>${escapeHtml(config.brideParents.mother)}</p>
-          <p class="family__address">${escapeHtml(config.brideParents.address)}</p>
-          <p class="family__child">Cô dâu ${escapeHtml(config.brideName)}</p>
-        </article>
-      </div>
-      <p class="story reveal">${escapeHtml(config.story)}</p>
-    </div>
-  </section>
-
+      </div>`)}
+${sheet('story', 'story-sheet', `
+      ${storyBg ? `<div class="parallax__layer" data-parallax-speed="0.25" style="opacity:.1">${picture(storyBg, { sizes: '100vw', alt: '' })}</div>` : ''}
+      ${ornament('tl')}
+      <div class="container" data-parallax-speed="0">
+        <span class="eyebrow">Nhà trai · Nhà gái</span>
+        <h2 class="section-title">Hai bên gia đình</h2>
+        <div class="families">
+          <article class="card family family--groom">
+            <span class="family__side">Nhà trai</span>
+            <p class="family__parents">${escapeHtml(config.groomParents.father)}<br>${escapeHtml(config.groomParents.mother)}</p>
+            <p class="family__address">${escapeHtml(config.groomParents.address)}</p>
+            <p class="family__child">Chú rể ${escapeHtml(config.groomName)}</p>
+          </article>
+          ${waxSeal(inv.monogram, 'families__seal')}
+          <article class="card family family--bride">
+            <span class="family__side">Nhà gái</span>
+            <p class="family__parents">${escapeHtml(config.brideParents.father)}<br>${escapeHtml(config.brideParents.mother)}</p>
+            <p class="family__address">${escapeHtml(config.brideParents.address)}</p>
+            <p class="family__child">Cô dâu ${escapeHtml(config.brideName)}</p>
+          </article>
+        </div>
+        <p class="story">${escapeHtml(config.story)}</p>
+      </div>`)}
 ${calendarSection(config)}
-
-  <section id="schedule" class="section parallax section--navy">
-    ${ornament('br')}
-    <div class="container" data-parallax-speed="0">
-      <span class="eyebrow">Lịch trình</span>
-      <h2 class="section-title">Hôn lễ &amp; tiệc cưới</h2>
-      <div class="events">
-        ${eventCard(config.ceremony, config.googleMapsUrl)}
-        ${eventCard(config.reception, config.googleMapsUrl)}
-      </div>
-    </div>
-  </section>
-
+${sheet('schedule', 'schedule-sheet', `
+      ${ornament('br')}
+      <div class="container" data-parallax-speed="0">
+        <span class="eyebrow">Lịch trình</span>
+        <h2 class="section-title">Ngày vui của chúng mình</h2>
+        <div class="events tickets tickets--single">${dayTicket(config)}</div>
+      </div>`)}
 ${countdownSection(config, photos)}
-
-  <section id="gallery" class="section parallax">
-    ${ornament('tl')}
-    <div class="container" data-parallax-speed="0">
-      <span class="eyebrow">Album</span>
-      <h2 class="section-title">Khoảnh khắc của chúng mình</h2>
-      ${galleryHtml}
-    </div>
-  </section>
-
+${sheet('gallery', 'gallery-sheet', `
+      ${ornament('tl')}
+      <div class="container" data-parallax-speed="0">
+        <span class="eyebrow">Album</span>
+        <h2 class="section-title">Khoảnh khắc của chúng mình</h2>
+        ${galleryHtml}
+      </div>`)}
 ${rsvpCtaSection(config, photos, 'data-cta="rsvp-bottom"')}
 ${closingSection(config)}
+</div>
 </main>
 <footer class="site-footer">${escapeHtml(config.groomName)} &amp; ${escapeHtml(config.brideName)} · ${escapeHtml(wedding.date)}</footer>`;
 

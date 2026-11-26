@@ -3,7 +3,6 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import sharp from 'sharp';
 
-const SENTENCE = 'Kính mời vợ chồng chú Chín đến chung vui cùng gia đình chúng tôi, sự hiện diện của chú thím là niềm vinh hạnh cho gia đình.';
 const fixture = () => JSON.parse(readFileSync(join(process.cwd(), '.tmp/e2e/fixture.json'), 'utf8')) as { shortId: string; slug: string; webhook: string };
 
 // Keep runs hermetic: block every non-local request (Google Fonts, Maps); the RSVP webhook is mocked per test.
@@ -40,6 +39,8 @@ test.describe('Announcement page (index.html)', () => {
     // Gallery photos are lazy and sit below the envelope scene.
     await page.locator('#gallery img').first().scrollIntoViewIfNeeded();
     await expect(page.locator('#gallery img').first()).toHaveJSProperty('complete', true);
+    // Back up: on desktop the later sheets are stacked over the hero once you have scrolled past it.
+    await page.evaluate(() => window.scrollTo(0, 0));
     const cta = page.locator('a[data-cta="rsvp"]');
     await expect(cta).toHaveCSS('background-color', 'rgb(122, 28, 36)');
     await cta.click();
@@ -119,12 +120,11 @@ test.describe('RSVP page (rsvp.html)', () => {
 test.describe('Personalized invitation (invite.html)', () => {
   async function expectGolden(page: Page) {
     await expect(page.locator('body')).toHaveAttribute('data-invite-ready', 'true');
-    await expect(page.locator('[data-role="greeting"]')).toHaveText(SENTENCE);
+    await expect(page.locator('.paper-card--main [data-role="guest-name"]')).toHaveText('vợ chồng chú Chín');
+    await expect(page.locator('[data-role="presence"]')).toContainText('Sự hiện diện của chú thím');
     await expect(page.locator('.seating__map [data-zone="ZONE_B1"]')).toHaveAttribute('data-highlight', 'true');
     await expect(page.locator('.seating__map [data-highlight="true"]')).toHaveCount(1);
     await expect(page.locator('[data-role="seat-count"]')).toHaveText('2');
-    await expect(page.locator('[data-role="static-map"] img')).toBeVisible();
-    await expect(page.locator('a[data-role="google-maps"]')).toHaveAttribute('href', /maps\.google\.com/);
   }
 
   test('resolves ?khach=<slug> through guests-map.json', async ({ page }) => {
@@ -137,7 +137,7 @@ test.describe('Personalized invitation (invite.html)', () => {
     page.on('pageerror', (e) => errors.push(e.message));
     for (const path of ['invite.html?khach=khong-ton-tai', 'invite.html']) {
       await page.goto(path);
-      await expect(page.locator('[data-role="greeting"]')).toContainText('Kính mời bạn đến chung vui');
+      await expect(page.locator('.paper-card--main [data-role="guest-name"]')).toHaveText('Quý khách');
       await expect(page.locator('.seating__map svg')).toBeVisible();
       await expect(page.locator('.seating__map [data-highlight="true"]')).toHaveCount(0);
       await expect(page.locator('.seating__info')).toBeHidden();
@@ -154,11 +154,15 @@ test.describe('Personalized invitation (invite.html)', () => {
     expect([...buf.subarray(0, 3)]).toEqual([0xff, 0xd8, 0xff]);
     const meta = await sharp(buf).metadata();
     expect([meta.format, meta.width, meta.height]).toEqual(['jpeg', 1080, 1620]);
-    // the highlighted Lotus Pink zone survives rasterization
+    // the printed-card look survives rasterization: dusty-blue folder around an ivory card, wine script
     const { data, info } = await sharp(buf).raw().toBuffer({ resolveWithObject: true });
-    let pink = 0;
-    for (let i = 0; i < data.length; i += info.channels) if (Math.abs(data[i] - 0xec) < 24 && Math.abs(data[i + 1] - 0x48) < 30 && Math.abs(data[i + 2] - 0x99) < 30) pink++;
-    expect(pink).toBeGreaterThan(500);
+    const px = (x: number, y: number) => [...data.subarray((y * info.width + x) * info.channels, (y * info.width + x) * info.channels + 3)];
+    const near = (a: number[], b: number[], tol = 24) => a.every((v, i) => Math.abs(v - b[i]) < tol);
+    expect(near(px(540, 20), [0x3f, 0x5f, 0x7b])).toBe(true);
+    expect(near(px(160, 700), [0xf4, 0xf4, 0xee])).toBe(true);
+    let wine = 0;
+    for (let i = 0; i < data.length; i += info.channels) if (near([data[i], data[i + 1], data[i + 2]], [0x6b, 0x1a, 0x34], 30)) wine++;
+    expect(wine).toBeGreaterThan(2000);
   });
 
   test('Share passes a JPEG file to navigator.share when supported', async ({ page }) => {

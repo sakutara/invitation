@@ -1,5 +1,6 @@
 /** Shared runtime of the envelope pages (index.html, invite.html): scroll scenes, wax-seal tap, countdown. */
 import { initScrollScenes, scrollSceneTo } from './scroll-scene';
+import { initSheetStack } from './sheet-stack';
 
 /** d/h/m/s left until `target` (all zero once it has passed). */
 export function countdownParts(target: number, now: number): { days: number; hours: number; minutes: number; seconds: number; done: boolean } {
@@ -37,6 +38,7 @@ export function initEnvelope(doc: Document = document): void {
 
 export function initEnvelopePage(doc: Document = document): void {
   initScrollScenes(doc, doc.defaultView ?? window);
+  initSheetStack(doc, doc.defaultView ?? window);
   initEnvelope(doc);
   initCountdown(doc);
 }

@@ -32,15 +32,26 @@ describe('index.html (Announcement page)', () => {
     expect(doc.querySelector('meta[property="og:title"]')).not.toBeNull();
   });
 
-  it('shows the couple, wedding news, family details and both events', () => {
+  it('shows the couple, wedding news and family details; the schedule gives only the day and the city', () => {
     const text = render().body.textContent!.replace(/\s+/g, ' ');
     for (const s of [
       DEFAULT_CONFIG.groomName, DEFAULT_CONFIG.brideName, DEFAULT_CONFIG.headline, DEFAULT_CONFIG.story,
       DEFAULT_CONFIG.groomParents.father, DEFAULT_CONFIG.brideParents.mother,
-      DEFAULT_CONFIG.ceremony.title, DEFAULT_CONFIG.ceremony.address, DEFAULT_CONFIG.reception.venueName, DEFAULT_CONFIG.reception.address,
-      '09:00', '18:00', 'Thứ Bảy, 16/01/2027',
     ]) expect(text, s).toContain(s);
-    expect(render().querySelector(`a[href="${DEFAULT_CONFIG.googleMapsUrl}"]`)).not.toBeNull();
+    const tickets = [...render().querySelectorAll('#schedule .event')];
+    expect(tickets).toHaveLength(1);
+    const t = tickets[0].textContent!.replace(/\s+/g, ' ');
+    expect(t).toContain('Thứ Bảy');
+    expect(t).toContain('16.01.2027');
+    expect(tickets[0].querySelector('.event__city')!.textContent).toBe('TP. Cần Thơ');
+    for (const s of [DEFAULT_CONFIG.ceremony.title, DEFAULT_CONFIG.reception.title, '09:00', '18:00', DEFAULT_CONFIG.reception.address]) expect(t, s).not.toContain(s);
+  });
+
+  it('labels the envelope card "Báo Hỉ" without the invitation line', () => {
+    const doc = render();
+    expect(doc.querySelector('.letter-card__title')!.textContent).toBe('Báo Hỉ');
+    expect(doc.querySelector('.letter-card__invite, .letter-card [data-role="guest-name"]')).toBeNull();
+    expect(doc.body.textContent).not.toMatch(/trân trọng kính mời/i);
   });
 
   it('has Hero, Family Story, Schedule and Gallery sections with 3 parallax layers', () => {
@@ -83,8 +94,8 @@ describe('index.html (Announcement page)', () => {
   it('gives each gallery figure the aspect ratio of its stored variant so the crop is shown as framed', () => {
     const doc = render([photo('land'), photo('port', 'gallery', true)]);
     const [land, port] = [...doc.querySelectorAll<HTMLElement>('#gallery .gallery__item')];
-    expect(land.getAttribute('style')).toBe('aspect-ratio: 640 / 427');
-    expect(port.getAttribute('style')).toBe('aspect-ratio: 640 / 960');
+    expect(land.getAttribute('style')).toMatch(/^aspect-ratio: 640 \/ 427;/);
+    expect(port.getAttribute('style')).toMatch(/^aspect-ratio: 640 \/ 960;/);
     expect(port.classList.contains('gallery__item--portrait')).toBe(true);
   });
 
