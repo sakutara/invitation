@@ -3,8 +3,8 @@
     "groomName": "Hoàng Trung",
     "brideName": "Bảo Châu",
     "groomParents": {
-      "father": "Ông Lê Văn Chính",
-      "mother": "Bà Trương Thị Thanh Chi",
+      "father": "Ông Lê Văn Lâm",
+      "mother": "Bà Trương Thị Ngọc Hạnh",
       "address": "Thống Nhất, Tp. Đồng Nai"
     },
     "brideParents": {
@@ -48,7 +48,7 @@
       "coverEyebrow": "Thư mời hạnh phúc từ",
       "openHint": "Cuộn xuống để mở thiệp",
       "archTitle": "Thiệp Mời",
-      "announceArchTitle": "Báo Hỉ",
+      "announceArchTitle": "Báo Hỷ",
       "monogram": "",
       "momentLine": "Khoảnh khắc ấy đã đến…",
       "scriptHeadline": "Chúng mình về chung một nhà",
@@ -56,7 +56,7 @@
       "inviteLine": "Tới dự bữa cơm thân mật mừng lễ thành hôn\nchung vui cùng gia đình chúng tôi",
       "presenceLine": "Sự hiện diện của {khach}\nlà niềm vinh hạnh cho gia đình chúng tôi!",
       "ceremonyWelcome": "Rất hân hạnh được đón tiếp!",
-      "place": "",
+      "place": "Huế",
       "calendarTitle": "Ngày chung đôi",
       "countdownTitle": "Hẹn gặp bạn trong ngày vui",
       "countdownDoneText": "Cảm ơn bạn đã cùng chung vui",
@@ -64,7 +64,7 @@
       "rsvpNote": "Mong bạn xác nhận tham dự để chúng mình chuẩn bị chu đáo nhất.",
       "closingTitle": "Thân thương",
       "closingNote": "Mọi thắc mắc xin liên hệ cô dâu & chú rể",
-      "contact": ""
+      "contact": "0988765444"
     }
   },
   "photos": [
@@ -146,10 +146,10 @@
       "sortOrder": 2,
       "focalPoint": null,
       "crop": {
-        "x": 0,
-        "y": 0.533556,
-        "w": 1,
-        "h": 0.374855
+        "x": 0.147813,
+        "y": 0.580252,
+        "w": 0.826446,
+        "h": 0.309797
       },
       "variants": [
         {
@@ -169,43 +169,43 @@
         {
           "tier": "md",
           "format": "webp",
-          "width": 859,
-          "height": 483,
+          "width": 710,
+          "height": 399,
           "src": "assets/images/photo-602f8e54/photo-602f8e54-md.webp"
         },
         {
           "tier": "md",
           "format": "jpg",
-          "width": 859,
-          "height": 483,
+          "width": 710,
+          "height": 399,
           "src": "assets/images/photo-602f8e54/photo-602f8e54-md.jpg"
         },
         {
           "tier": "lg",
           "format": "webp",
-          "width": 859,
-          "height": 483,
+          "width": 710,
+          "height": 399,
           "src": "assets/images/photo-602f8e54/photo-602f8e54-lg.webp"
         },
         {
           "tier": "lg",
           "format": "jpg",
-          "width": 859,
-          "height": 483,
+          "width": 710,
+          "height": 399,
           "src": "assets/images/photo-602f8e54/photo-602f8e54-lg.jpg"
         },
         {
           "tier": "fhd",
           "format": "webp",
-          "width": 859,
-          "height": 483,
+          "width": 710,
+          "height": 399,
           "src": "assets/images/photo-602f8e54/photo-602f8e54-fhd.webp"
         },
         {
           "tier": "fhd",
           "format": "jpg",
-          "width": 859,
-          "height": 483,
+          "width": 710,
+          "height": 399,
           "src": "assets/images/photo-602f8e54/photo-602f8e54-fhd.jpg"
         }
       ]
@@ -561,5 +561,5 @@
       }
     ]
   },
-  "builtAt": "2026-11-27T02:13:27.495Z"
+  "builtAt": "2026-11-27T03:59:38.009Z"
 }

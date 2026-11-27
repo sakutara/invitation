@@ -1,7 +1,8 @@
-/** Trang Đăng Ký — dist/rsvp.html (single 100dvh viewport, no vertical scroll). */
+/** Trang Đăng Ký — dist/dang-ky/index.html (single 100dvh viewport, no vertical scroll). */
 import { escapeHtml } from '../../shared/html';
 import { formatViDateTime } from '../../shared/date-format';
 import { RELATIONSHIP_GROUPS, RELATIONSHIP_KEYS, type WeddingData } from '../../shared/types';
+import { rebaseAssets, SUBPAGE_ROOT } from '../../shared/routes';
 import { documentShell, firstPhoto, floralSpray, picture } from './partials';
 import { flapSvg, pocketSvg } from './envelope.partials';
 
@@ -12,7 +13,7 @@ function field(id: string, label: string, control: string): string {
 }
 
 export function renderRsvpPage(data: PageData): string {
-  const { config, photos } = data;
+  const { config, photos } = rebaseAssets(data, SUBPAGE_ROOT);
   const bg = firstPhoto(photos, 'rsvp_background', 'hero', 'gallery');
   const wedding = formatViDateTime(config.reception.datetime || config.ceremony.datetime);
   const options = RELATIONSHIP_KEYS.map((k) => `<option value="${k}">${escapeHtml(RELATIONSHIP_GROUPS[k].displayVi)}</option>`).join('');
@@ -40,9 +41,9 @@ export function renderRsvpPage(data: PageData): string {
       <h2>Cảm ơn bạn!</h2>
       <p class="rsvp__thanks-text"></p>
       <p class="rsvp__countdown"></p>
-      <a class="btn btn--ghost btn--ink" href="index.html">Về trang báo hỉ</a>
+      <a class="btn btn--ghost btn--ink" href="${SUBPAGE_ROOT}">Về trang báo hỉ</a>
     </div>
-    <a class="rsvp__back" href="index.html">← Quay lại trang báo hỉ</a>
+    <a class="rsvp__back" href="${SUBPAGE_ROOT}">← Quay lại trang báo hỉ</a>
   </section>
   <div class="rsvp-env__pocket" data-envelope aria-hidden="true">${pocketSvg('rsvp-env__svg')}${floralSpray('rsvp-env__floral')}</div>
   <div class="rsvp-env__flap" data-envelope aria-hidden="true">${flapSvg('rsvp-env__svg', 150)}</div>
@@ -55,6 +56,7 @@ export function renderRsvpPage(data: PageData): string {
     description: `Đăng ký tham dự đám cưới ${config.groomName} & ${config.brideName}`,
     bodyClass: 'page-rsvp',
     script: 'rsvp.js',
+    root: SUBPAGE_ROOT,
     body,
   });
 }

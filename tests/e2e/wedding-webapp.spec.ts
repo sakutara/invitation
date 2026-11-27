@@ -16,7 +16,7 @@ async function noHorizontalOverflow(page: Page) {
 }
 
 test.describe('Fluid layout & Navy-Burgundy theme', () => {
-  for (const path of ['index.html', 'rsvp.html', `invite.html?khach=${fixture().slug}`]) {
+  for (const path of ['index.html', 'dang-ky/', `thiep-moi/?khach=${fixture().slug}`]) {
     test(`${path.split('?')[0]} has no horizontal overflow at 360/390/768/1920 and uses palette tokens`, async ({ page }) => {
       for (const [w, h] of [[360, 640], [390, 844], [768, 1024], [1920, 1080]]) {
         await page.setViewportSize({ width: w, height: h });
@@ -44,7 +44,7 @@ test.describe('Announcement page (index.html)', () => {
     const cta = page.locator('a[data-cta="rsvp"]');
     await expect(cta).toHaveCSS('background-color', 'rgb(122, 28, 36)');
     await cta.click();
-    await expect(page).toHaveURL(/\/rsvp\.html$/);
+    await expect(page).toHaveURL(/\/dang-ky\/$/);
   });
 
   test('parallax layers translate with scroll via translate3d', async ({ page }) => {
@@ -76,15 +76,15 @@ test.describe('Announcement page (index.html)', () => {
   });
 });
 
-test.describe('RSVP page (rsvp.html)', () => {
-  test('fits one viewport, upserts by phone, thanks the guest and returns to index.html', async ({ page }) => {
+test.describe('RSVP page (dang-ky/)', () => {
+  test('fits one viewport, upserts by phone, thanks the guest and returns to the home page', async ({ page }) => {
     const { webhook } = fixture();
     const requests: { body: any; contentType: string | undefined }[] = [];
     await page.route(webhook, async (route) => {
       requests.push({ body: JSON.parse(route.request().postData() ?? '{}'), contentType: route.request().headers()['content-type'] });
       await route.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ ok: true, operation: 'INSERTED' }) });
     });
-    await page.goto('rsvp.html');
+    await page.goto('dang-ky/');
     const dims = await page.evaluate(() => ({ sh: document.documentElement.scrollHeight, ih: window.innerHeight }));
     expect(dims.sh).toBeLessThanOrEqual(dims.ih);
     await expect(page.locator('form.rsvp__form button[type="submit"]')).toBeInViewport();
@@ -102,12 +102,12 @@ test.describe('RSVP page (rsvp.html)', () => {
     expect(requests[0].body).toEqual({ fullName: 'Nguyễn Văn An', phone: '0905123456', relationship: 'bạn bè chú rể', attendees: 2 });
     const after = await page.evaluate(() => ({ sh: document.documentElement.scrollHeight, ih: window.innerHeight }));
     expect(after.sh).toBeLessThanOrEqual(after.ih);
-    await page.waitForURL(/\/index\.html$/, { timeout: 10_000 });
+    await page.waitForURL((u) => u.pathname === '/', { timeout: 10_000 });
   });
 
   test('keeps the envelope flap hinged on the envelope while the reply card is sent', async ({ page }) => {
     await page.route(fixture().webhook, (r) => r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ ok: true }) }));
-    await page.goto('rsvp.html');
+    await page.goto('dang-ky/');
     await page.getByLabel('Họ và tên').fill('Nguyễn Văn An');
     await page.getByLabel('Số điện thoại').fill('0905123456');
     await page.getByLabel('Bạn là').selectOption('groom_friends');
@@ -140,7 +140,7 @@ test.describe('RSVP page (rsvp.html)', () => {
   test('blocks invalid input client-side', async ({ page }) => {
     let called = false;
     await page.route(fixture().webhook, (r) => { called = true; return r.abort(); });
-    await page.goto('rsvp.html');
+    await page.goto('dang-ky/');
     await page.getByLabel('Số điện thoại').fill('12345');
     await page.getByRole('button', { name: 'Gửi xác nhận' }).click();
     await expect(page.locator('#phone')).toHaveAttribute('aria-invalid', 'true');
@@ -149,7 +149,7 @@ test.describe('RSVP page (rsvp.html)', () => {
   });
 });
 
-test.describe('Personalized invitation (invite.html)', () => {
+test.describe('Personalized invitation (thiep-moi/)', () => {
   async function expectGolden(page: Page) {
     await expect(page.locator('body')).toHaveAttribute('data-invite-ready', 'true');
     await expect(page.locator('.paper-card--main [data-role="guest-name"]')).toHaveText('vợ chồng chú Chín');
@@ -160,14 +160,14 @@ test.describe('Personalized invitation (invite.html)', () => {
   }
 
   test('resolves ?khach=<slug> through guests-map.json', async ({ page }) => {
-    await page.goto(`invite.html?khach=${fixture().slug}`);
+    await page.goto(`thiep-moi/?khach=${fixture().slug}`);
     await expectGolden(page);
   });
 
   test('shows the default invitation and a plain map for an unknown or missing link', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
-    for (const path of ['invite.html?khach=khong-ton-tai', 'invite.html']) {
+    for (const path of ['thiep-moi/?khach=khong-ton-tai', 'thiep-moi/']) {
       await page.goto(path);
       await expect(page.locator('.paper-card--main [data-role="guest-name"]')).toHaveText('Quý khách');
       await expect(page.locator('.seating__map svg')).toBeVisible();
@@ -178,7 +178,7 @@ test.describe('Personalized invitation (invite.html)', () => {
   });
 
   test('Save JPG downloads a 1080x1620 JPEG card', async ({ page }) => {
-    await page.goto(`invite.html?khach=${fixture().slug}`);
+    await page.goto(`thiep-moi/?khach=${fixture().slug}`);
     await expect(page.locator('body')).toHaveAttribute('data-invite-ready', 'true');
     const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#save-jpg').click()]);
     expect(download.suggestedFilename()).toBe('Thiep-Moi-vo-chong-chu-chin.jpg');
@@ -210,7 +210,7 @@ test.describe('Personalized invitation (invite.html)', () => {
         },
       });
     });
-    await page.goto(`invite.html?khach=${fixture().slug}`);
+    await page.goto(`thiep-moi/?khach=${fixture().slug}`);
     await expect(page.locator('body')).toHaveAttribute('data-invite-ready', 'true');
     await page.locator('#share-jpg').click();
     await expect.poll(() => page.evaluate(() => (window as any).__shared)).not.toBeNull();
@@ -218,5 +218,30 @@ test.describe('Personalized invitation (invite.html)', () => {
     expect(shared).toMatchObject({ name: 'Thiep-Moi-vo-chong-chu-chin.jpg', type: 'image/jpeg', width: 1080, height: 1620 });
     expect(shared.size).toBeGreaterThan(50_000);
     await expect(page.locator('.save-card__status')).toHaveText('Đã chia sẻ thiệp.');
+  });
+});
+
+test.describe('Friendly URLs', () => {
+  test('old page addresses redirect and keep the guest in the link', async ({ page }) => {
+    await page.goto(`invite.html?khach=${fixture().slug}`);
+    await page.waitForURL((u) => u.pathname === '/thiep-moi/' && u.search === `?khach=${fixture().slug}`);
+    await expect(page.locator('.paper-card--main [data-role="guest-name"]')).toHaveText('vợ chồng chú Chín');
+    await page.goto('rsvp.html');
+    await page.waitForURL((u) => u.pathname === '/dang-ky/');
+  });
+
+  test('a folder URL without its slash is completed, and every local asset of each page loads', async ({ page }) => {
+    const broken: string[] = [];
+    page.on('response', (r) => { if (r.url().startsWith('http://127.0.0.1') && r.status() >= 400) broken.push(r.url()); });
+    await page.goto(`thiep-moi?khach=${fixture().slug}`);
+    await expect(page).toHaveURL(/\/thiep-moi\/\?khach=/);
+    for (const path of ['index.html', 'thiep-moi/', 'dang-ky']) {
+      await page.goto(path);
+      for (const img of await page.locator('img[src]').all()) {
+        await img.evaluate((el: HTMLImageElement) => { el.loading = 'eager'; });
+        await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0), { message: `${path}: ${await img.getAttribute('src')}` }).toBe(true);
+      }
+    }
+    expect(broken).toEqual([]);
   });
 });

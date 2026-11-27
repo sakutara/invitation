@@ -65,7 +65,7 @@ describe('index.html (Announcement page)', () => {
   });
 
   it('links the primary Burgundy CTA to rsvp.html', () => {
-    const ctas = [...render().querySelectorAll('a.btn[href="rsvp.html"]')];
+    const ctas = [...render().querySelectorAll('a.btn[href="dang-ky/"]')];
     expect(ctas.length).toBeGreaterThanOrEqual(2);
     expect(ctas[0].getAttribute('data-cta')).toBe('rsvp');
   });

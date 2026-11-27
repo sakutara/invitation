@@ -145,6 +145,14 @@ export async function serveStatic(rootDir: string, relPath: string, res: ServerR
   if (target !== root && !target.startsWith(root + sep)) return false;
   try {
     const s = await stat(target);
+    // A folder URL needs its trailing slash, otherwise the page's relative links resolve one level too high.
+    if (s.isDirectory()) {
+      const url = new URL(res.req?.url ?? '/', 'http://x');
+      if (!url.pathname.endsWith('/')) {
+        res.writeHead(301, { location: `${url.pathname.replace(/^\/+/, '/')}/${url.search}` }).end();
+        return true;
+      }
+    }
     const file = s.isDirectory() ? join(target, 'index.html') : target;
     const data = await readFile(file);
     res.writeHead(200, { 'content-type': MIME[extname(file).toLowerCase()] ?? 'application/octet-stream', 'cache-control': 'no-cache' });
@@ -359,7 +367,7 @@ export function createServer(opts: ServerOptions): http.Server {
       }
       res.writeHead(code, { 'content-type': 'application/json; charset=utf-8' }).end(JSON.stringify(body));
     };
-    // The public static site (/site/*, incl. invite.html and its guests-map) never asks for a login; only the CMS/API does.
+    // The public static site (/site/*, incl. thiep-moi/ and its guests-map) never asks for a login; only the CMS/API does.
     const isPublicSite = req.method === 'GET' && (url.pathname === '/site' || url.pathname.startsWith('/site/'));
     if (opts.auth && !isPublicSite && !isAuthorized(req, opts.auth)) {
       res.writeHead(401, { 'www-authenticate': 'Basic realm="Wedding CMS", charset="UTF-8"', 'content-type': 'text/plain; charset=utf-8' });

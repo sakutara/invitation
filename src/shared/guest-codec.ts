@@ -1,7 +1,8 @@
 /**
  * Hybrid guest URL codec (okf/invitation_and_seating_rules.md §3).
- * Isomorphic: runs in Node (backend/static builder) and in the browser (invite.html).
+ * Isomorphic: runs in Node (backend/static builder) and in the browser (thiep-moi/).
  */
+import { PAGE_DIRS } from './routes';
 import { FALLBACK_GUEST, RELATIONSHIP_GROUPS, RELATIONSHIP_KEYS, type GuestInvitePayload, type RelationshipKey } from './types';
 import { normalizeVnPhone } from './phone-normalizer';
 import { slugify } from './slug';
@@ -156,5 +157,5 @@ export async function resolveGuestFromLocation(
 }
 
 export function buildInviteUrl(baseUrl: string, ref: { slug: string }): string {
-  return `${baseUrl.replace(/\/+$/, '')}/invite.html?${GUEST_PARAM}=${encodeURIComponent(ref.slug)}`;
+  return `${baseUrl.replace(/\/+$/, '')}/${PAGE_DIRS.invite}?${GUEST_PARAM}=${encodeURIComponent(ref.slug)}`;
 }

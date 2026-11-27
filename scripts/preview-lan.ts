@@ -7,7 +7,7 @@ import { serveStatic } from '../src/backend/server';
 
 const port = Number(process.argv[2] ?? 4180);
 const { shortId } = await buildE2eSite();
-const rsvp = join(E2E_DIST, 'rsvp.html');
+const rsvp = join(E2E_DIST, 'dang-ky/index.html');
 await writeFile(rsvp, (await readFile(rsvp, 'utf8')).replaceAll(E2E_WEBHOOK, '/__mock-rsvp'));
 
 http

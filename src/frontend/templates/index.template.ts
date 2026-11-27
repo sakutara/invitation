@@ -1,4 +1,5 @@
 /** Trang Báo Hỉ — dist/index.html */
+import { PAGE_DIRS } from '../../shared/routes';
 import { escapeHtml } from '../../shared/html';
 import { formatViDateTime } from '../../shared/date-format';
 import type { WeddingData } from '../../shared/types';
@@ -50,7 +51,7 @@ ${sheet('hero', 'hero-sheet', `
           <h2 class="hero__script script rise" style="--d:.1">${escapeHtml(config.headline)}</h2>
           <hr class="divider rise" style="--d:.18">
           <div class="hero__actions rise" style="--d:.24">
-            <a class="btn" href="rsvp.html" data-cta="rsvp">Đăng ký tham dự</a>
+            <a class="btn" href="${PAGE_DIRS.rsvp}" data-cta="rsvp">Đăng ký tham dự</a>
             <a class="btn btn--ghost btn--ink" href="#schedule">Xem lịch trình</a>
           </div>
         </div>

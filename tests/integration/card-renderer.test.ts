@@ -12,7 +12,7 @@ import { SEATING_ZONES } from '../../src/shared/types';
 
 const GOLDEN = { salutation: 'chú thím', name: 'vợ chồng chú Chín', relationship: 'gia đình cô dâu', count: 2 };
 const SENTENCE = 'Kính mời vợ chồng chú Chín đến chung vui cùng gia đình chúng tôi, sự hiện diện của chú thím là niềm vinh hạnh cho gia đình.';
-const INPUT = { config: DEFAULT_CONFIG, zones: SEATING_ZONES, guest: GOLDEN, inviteUrl: 'https://example.com/invite.html?khach=vo-chong-chu-chin-gia-dinh-co-dau' };
+const INPUT = { config: DEFAULT_CONFIG, zones: SEATING_ZONES, guest: GOLDEN, inviteUrl: 'https://example.com/thiep-moi/?khach=vo-chong-chu-chin-gia-dinh-co-dau' };
 
 let dir: string;
 beforeAll(() => { dir = mkdtempSync(join(tmpdir(), 'wedding-card-')); });
@@ -107,7 +107,7 @@ describe('generateCards (bulk)', () => {
       expect(existsSync(r.path)).toBe(true);
       const meta = await sharp(readFileSync(r.path)).metadata();
       expect([meta.width, meta.height]).toEqual([1080, 1620]);
-      expect(r.inviteUrl).toBe(`${DEFAULT_CONFIG.siteBaseUrl.replace(/\/$/, '')}/invite.html?khach=${guestSlugBase(guests.find((g) => g.rowId === r.rowId)!)}`);
+      expect(r.inviteUrl).toBe(`${DEFAULT_CONFIG.siteBaseUrl.replace(/\/$/, '')}/thiep-moi/?khach=${guestSlugBase(guests.find((g) => g.rowId === r.rowId)!)}`);
     }
   });
 });

@@ -76,7 +76,7 @@ describe('Bulk Invitation Studio', () => {
     for (const row of sheet.rows.slice(1)) {
       expect(row[7]).toMatch(/^[0-9a-f]{6}$/);
       const slug = new URL(String(row[8])).searchParams.get('khach')!;
-      expect(String(row[8])).toBe(`https://cuoi.example.com/invite.html?khach=${slug}`);
+      expect(String(row[8])).toBe(`https://cuoi.example.com/thiep-moi/?khach=${slug}`);
       expect(slug).toMatch(/^khach-moi-so-\d+-khac(-\d+)?$|^khach-moi-so-\d+-/);
       expect(row[9]).toBe('GENERATED');
       expect(map[slug]).toBeDefined();
@@ -90,7 +90,7 @@ describe('Bulk Invitation Studio', () => {
     expect(g.status).toBe('GENERATED');
     expect(g.cardUrl).toMatch(/^\/api\/bulk\/cards\/1_[0-9a-f]{6}_khach-moi-so-1\.jpg$/);
     expect(g.assist.zaloUrl).toBe('https://zalo.me/0905123401');
-    expect(g.assist.inviteUrl).toBe(`https://cuoi.example.com/invite.html?khach=${g.slug}`);
+    expect(g.assist.inviteUrl).toBe(`https://cuoi.example.com/thiep-moi/?khach=${g.slug}`);
     expect(g.assist.clipboardText).toContain('Kính mời khách mời số 1 đến chung vui');
     expect(g.assist.clipboardText).toContain(g.assist.inviteUrl);
     const card = await fetch(base + g.cardUrl);
@@ -134,10 +134,10 @@ describe('buildDispatchAssist', () => {
       DEFAULT_CONFIG,
     );
     expect(a.zaloUrl).toBe('https://zalo.me/0905123456');
-    expect(a.inviteUrl).toBe('https://example.com/invite.html?khach=vo-chong-chu-chin-gia-dinh-co-dau');
+    expect(a.inviteUrl).toBe('https://example.com/thiep-moi/?khach=vo-chong-chu-chin-gia-dinh-co-dau');
     expect(a.messengerUrl).toBe(`fb-messenger://share?link=${encodeURIComponent(a.inviteUrl)}`);
     expect(a.clipboardText).toBe(
-      'Kính mời vợ chồng chú Chín đến chung vui cùng gia đình chúng tôi, sự hiện diện của chú thím là niềm vinh hạnh cho gia đình.\nThiệp mời: https://example.com/invite.html?khach=vo-chong-chu-chin-gia-dinh-co-dau',
+      'Kính mời vợ chồng chú Chín đến chung vui cùng gia đình chúng tôi, sự hiện diện của chú thím là niềm vinh hạnh cho gia đình.\nThiệp mời: https://example.com/thiep-moi/?khach=vo-chong-chu-chin-gia-dinh-co-dau',
     );
   });
 

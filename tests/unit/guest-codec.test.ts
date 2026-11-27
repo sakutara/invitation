@@ -121,6 +121,6 @@ describe('resolveGuestFromQuery', () => {
 
 describe('buildInviteUrl', () => {
   it('builds slug URLs', () => {
-    expect(buildInviteUrl('https://example.com/wedding/', { slug: 'chu-chin-gia-dinh-co-dau' })).toBe('https://example.com/wedding/invite.html?khach=chu-chin-gia-dinh-co-dau');
+    expect(buildInviteUrl('https://example.com/wedding/', { slug: 'chu-chin-gia-dinh-co-dau' })).toBe('https://example.com/wedding/thiep-moi/?khach=chu-chin-gia-dinh-co-dau');
   });
 });

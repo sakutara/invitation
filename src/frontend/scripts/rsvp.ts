@@ -1,5 +1,6 @@
 /** RSVP form: validation, unique-phone webhook submission (text/plain, CORS-safe), thank-you view, auto-return. */
 import { playSendAnimation } from './rsvp-send';
+import { SUBPAGE_ROOT } from '../../shared/routes';
 import { isValidVnPhone, normalizeVnPhone } from '../../shared/phone-normalizer';
 import { resolveRelationship } from '../../shared/guest-codec';
 import { RELATIONSHIP_GROUPS, type RsvpFormConfig, type RsvpSubmission } from '../../shared/types';
@@ -130,7 +131,7 @@ export function initRsvpPage(doc: Document = document, opts: RsvpPageOptions = {
       }, 1000);
       setTimeout(() => {
         clearInterval(tick);
-        navigate('index.html');
+        navigate(SUBPAGE_ROOT);
       }, delay);
     } catch (e) {
       message.textContent = `Chưa gửi được: ${(e as Error).message}. Vui lòng thử lại.`;

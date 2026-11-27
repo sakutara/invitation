@@ -46,8 +46,8 @@ describe('rsvp.html template', () => {
 
   it('has a hidden thank-you view and a link back to index.html', () => {
     expect($<HTMLElement>('.rsvp__thanks').hidden).toBe(true);
-    expect(document.querySelector('a[href="index.html"]')).not.toBeNull();
-    expect(document.querySelector('script[src="assets/js/rsvp.js"]')).not.toBeNull();
+    expect(document.querySelector('a[href="../"]')).not.toBeNull();
+    expect(document.querySelector('script[src="../assets/js/rsvp.js"]')).not.toBeNull();
   });
 });
 
@@ -123,7 +123,7 @@ describe('initRsvpPage', () => {
     expect($<HTMLElement>('.rsvp__thanks').textContent).toContain('Nguyễn Văn An');
     expect(navigate).not.toHaveBeenCalled();
     vi.advanceTimersByTime(5000);
-    expect(navigate).toHaveBeenCalledWith('index.html');
+    expect(navigate).toHaveBeenCalledWith('../');
   });
 
   it('tells returning guests their registration was updated', async () => {

@@ -1,14 +1,16 @@
-/** Trang Mời Cưới — dist/invite.html (personalized client-side from ?khach=<slug>, looked up in the DB-built guests-map.json). */
+/** Trang Mời Cưới — dist/thiep-moi/index.html (personalized client-side from ?khach=<slug>, looked up in the DB-built guests-map.json). */
 import { escapeHtml, jsonForScript } from '../../shared/html';
 import { formatViDateTime } from '../../shared/date-format';
 import { mapSeating, renderSeatingMapSvg } from '../../shared/seating-mapper';
 import { FALLBACK_GUEST, type WeddingData } from '../../shared/types';
+import { rebaseAssets, SUBPAGE_ROOT } from '../../shared/routes';
 import { documentShell, eventCard, firstPhoto, ornament, variant } from './partials';
 import { calendarSection, closingSection, countdownSection, envelopeScene, invitationCards, sheet } from './envelope.partials';
 
 type PageData = Omit<WeddingData, 'guests'> & { builtAt?: string };
 
-export function renderInvitePage(data: PageData): string {
+export function renderInvitePage(input: PageData): string {
+  const data = rebaseAssets(input, SUBPAGE_ROOT);
   const { config, photos, seatingZones } = data;
   const hero = firstPhoto(photos, 'hero', 'gallery');
   const heroImg = hero ? variant(hero, 'lg') : undefined;
@@ -31,7 +33,7 @@ ${sheet('invite-hero', 'sheet--pair', `
           <a class="btn btn--navy" href="#seating">Xem chỗ ngồi</a>
         </div>
       </div>`)}
-${calendarSection(config)}
+${calendarSection(config, SUBPAGE_ROOT)}
 ${countdownSection(config, photos)}
 ${sheet('events', 'schedule-sheet', `
       ${ornament('tl')}
@@ -80,6 +82,7 @@ ${closingSection(config)}
     description: `Trân trọng kính mời quý khách đến dự tiệc cưới ${config.groomName} & ${config.brideName} — ${wedding.weekday}, ${wedding.date}`,
     bodyClass: 'page-invite',
     script: 'invite.js',
+    root: SUBPAGE_ROOT,
     ogImage: heroImg?.src ?? null,
     body,
   });

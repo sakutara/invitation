@@ -10,6 +10,7 @@ import { monthGrid, googleCalendarUrl, WEEKDAY_HEADERS_VI } from '../../shared/w
 import type { PhotoRecord, WeddingConfig } from '../../shared/types';
 import { firstPhoto, floralSpray, ornament, picture, variant } from './partials';
 import { lunarLine } from '../../shared/lunar-calendar';
+import { PAGE_DIRS } from '../../shared/routes';
 import { presenceLine } from '../../shared/invitation-formatter';
 import type { EventDetails } from '../../shared/types';
 
@@ -228,7 +229,7 @@ export function sheet(id: string, sheetClass: string, inner: string): string {
   </section>`;
 }
 
-export function calendarSection(config: WeddingConfig): string {
+export function calendarSection(config: WeddingConfig, root = ''): string {
   const inv = resolveInvitation(config);
   const mainIso = mainIsoOf(config);
   const wedding = formatViDateTime(mainIso);
@@ -239,7 +240,7 @@ export function calendarSection(config: WeddingConfig): string {
       <div class="container calendar-wrap" data-parallax-speed="0">
         ${calendarBlock(mainIso, inv.calendarTitle, wedding.weekday)}
         <div class="calendar__actions">
-          <a class="btn" href="assets/data/wedding.ics" download="dam-cuoi-${escapeHtml(yyyy ?? '')}.ics" data-role="add-calendar">Thêm vào lịch</a>
+          <a class="btn" href="${root}assets/data/wedding.ics" download="dam-cuoi-${escapeHtml(yyyy ?? '')}.ics" data-role="add-calendar">Thêm vào lịch</a>
           ${gcal ? `<a class="btn btn--ghost btn--ink" href="${escapeHtml(gcal)}" target="_blank" rel="noopener">Google Calendar</a>` : ''}
         </div>
       </div>`);
@@ -276,7 +277,7 @@ export function rsvpCtaSection(config: WeddingConfig, photos: PhotoRecord[], lin
             <span class="eyebrow">Thiệp hồi âm</span>
             <h2 class="rsvp-cta__title script">${escapeHtml(inv.rsvpTitle)}</h2>
             <p class="rsvp-cta__note">${escapeHtml(inv.rsvpNote)}</p>
-            <a class="btn" href="rsvp.html" ${linkAttrs}>Xác nhận tham dự</a>
+            <a class="btn" href="${PAGE_DIRS.rsvp}" ${linkAttrs}>Xác nhận tham dự</a>
           </div>
           ${pocketSvg('reply__pocket')}
         </div>

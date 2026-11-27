@@ -28,7 +28,7 @@ describe('invite.html template', () => {
     const data = JSON.parse(q('#wedding-data').textContent!);
     expect(data.config.groomName).toBe(DEFAULT_CONFIG.groomName);
     expect(data.seatingZones).toHaveLength(7);
-    expect(q('script[src="assets/js/invite.js"]')).not.toBeNull();
+    expect(q('script[src="../assets/js/invite.js"]')).not.toBeNull();
   });
 
   it('server-renders the default card wording for no-JS visitors', () => {
@@ -82,7 +82,7 @@ describe('initInvitePage', () => {
 
   it('reads the guest from the DB-built guests-map.json', async () => {
     await initInvitePage(document, { search: `?khach=${SLUG}`, fetchJson: fetchMap });
-    expect(fetchMap).toHaveBeenCalledWith('assets/data/guests-map.json');
+    expect(fetchMap).toHaveBeenCalledWith('../assets/data/guests-map.json');
     expect(text('.paper-card--main [data-role="guest-name"]')).toBe('vợ chồng chú Chín');
   });
 

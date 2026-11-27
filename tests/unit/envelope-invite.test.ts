@@ -91,7 +91,7 @@ describe('invitation content', () => {
     expect(day.textContent).toBe('16');
     expect(day.querySelector('.calendar__heart path')).not.toBeNull();
     expect(document.querySelector<HTMLElement>('[data-role="countdown"]')!.dataset.target).toBe(DEFAULT_CONFIG.ceremony.datetime);
-    expect(document.querySelector('a[data-role="add-calendar"]')!.getAttribute('href')).toBe('assets/data/wedding.ics');
+    expect(document.querySelector('a[data-role="add-calendar"]')!.getAttribute('href')).toBe('../assets/data/wedding.ics');
     expect(document.querySelector('.closing-card__contact')!.textContent).toBe('0905 123 456');
   });
 });
@@ -106,7 +106,7 @@ describe('index.html envelope', () => {
     for (const id of ['calendar', 'countdown', 'rsvp-cta', 'closing']) expect(ids).toContain(id);
     expect(document.querySelectorAll('h1')).toHaveLength(1);
     expect(document.querySelector('.calendar__cell--day .calendar__heart')).not.toBeNull();
-    expect(document.querySelector('#rsvp-cta a[data-cta="rsvp-bottom"]')!.getAttribute('href')).toBe('rsvp.html');
+    expect(document.querySelector('#rsvp-cta a[data-cta="rsvp-bottom"]')!.getAttribute('href')).toBe('dang-ky/');
   });
 });
 
@@ -141,7 +141,7 @@ describe('sheet stack', () => {
     }
     document.documentElement.innerHTML = pages[0].replace(/^[\s\S]*?<html[^>]*>/, '').replace(/<\/html>\s*$/, '');
     expect(document.querySelectorAll('.tickets .event')).toHaveLength(1);
-    expect(document.querySelector('.reply .reply__card a[href="rsvp.html"]')).not.toBeNull();
+    expect(document.querySelector('.reply .reply__card a[href="dang-ky/"]')).not.toBeNull();
     document.documentElement.innerHTML = pages[1].replace(/^[\s\S]*?<html[^>]*>/, '').replace(/<\/html>\s*$/, '');
     // invite.html: the printed cards carry the details; no directions, no RSVP (guests already replied)
     expect(document.querySelectorAll('.card-pair .paper-card')).toHaveLength(2);

@@ -3,6 +3,7 @@ import { resolveGuestFromLocation, buildInviteUrl, GUEST_PARAM, type GuestsMap }
 import { formatInvitation, guestNameLine, presenceLine } from '../../shared/invitation-formatter';
 import { mapSeating, renderSeatingMapSvg } from '../../shared/seating-mapper';
 import { renderCardSvg } from '../../shared/card-svg-template';
+import { PAGE_DIRS, SUBPAGE_ROOT } from '../../shared/routes';
 import { embeddedFontCss, withFontCss } from '../../shared/web-fonts';
 import { slugify } from '../../shared/slug';
 import { CARD_SPEC, FALLBACK_GUEST, RELATIONSHIP_GROUPS, type GuestInvitePayload, type PhotoRecord, type SeatingLayout, type SeatingZone, type WeddingConfig } from '../../shared/types';
@@ -102,10 +103,11 @@ async function defaultFetchJson(url: string): Promise<GuestsMap> {
 }
 
 function inviteUrlFor(config: WeddingConfig, search: string, win?: Window): string {
-  const base = win?.location?.origin?.startsWith('http') ? win.location.href.replace(/[?#].*$/, '').replace(/\/[^/]*$/, '') : config.siteBaseUrl;
+  // This page lives in a folder: the site root is one level up (works at a domain root and under a sub-path).
+  const base = win?.location?.origin?.startsWith('http') ? new URL(SUBPAGE_ROOT, win.location.href).href : config.siteBaseUrl;
   const slug = new URLSearchParams(search).get(GUEST_PARAM);
   if (slug) return buildInviteUrl(base, { slug });
-  return `${base.replace(/\/+$/, '')}/invite.html`;
+  return `${base.replace(/\/+$/, '')}/${PAGE_DIRS.invite}`;
 }
 
 export async function initInvitePage(doc: Document = document, opts: InviteOptions = {}): Promise<GuestInvitePayload> {
@@ -113,7 +115,7 @@ export async function initInvitePage(doc: Document = document, opts: InviteOptio
   const { config, seatingZones, seatingLayout } = data;
   const search = opts.search ?? doc.defaultView?.location.search ?? '';
   // Guest comes from the DB-built guests-map.json via ?khach=<slug>; unknown/missing = default invitation.
-  const known = await resolveGuestFromLocation(search, opts.fetchJson ?? defaultFetchJson);
+  const known = await resolveGuestFromLocation(search, opts.fetchJson ?? defaultFetchJson, `${SUBPAGE_ROOT}assets/data/guests-map.json`);
   const guest = known ?? { ...FALLBACK_GUEST };
   const group = RELATIONSHIP_GROUPS[guest.relationship];
   const seat = mapSeating(guest, seatingZones);

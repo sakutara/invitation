@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Publish dist/ (index.html, rsvp.html, invite.html + assets) to the gh-pages branch of the
+# Publish dist/ (index.html, thiep-moi/, dang-ky/ + assets) to the gh-pages branch of the
 # GitHub repo that serves https://invitation.fiddle.vn. Only dist/ is published — data/ (SQLite,
 # guest phones/emails, original photos) and the source never leave this machine.
 #
@@ -17,7 +17,7 @@ if [ -z "${SKIP_BUILD:-}" ]; then
   (cd "$ROOT" && npm run --silent build)
 fi
 
-for page in index.html rsvp.html invite.html; do
+for page in index.html thiep-moi/index.html dang-ky/index.html; do
   [ -f "$DIST/$page" ] || { echo "Missing $DIST/$page — build failed?" >&2; exit 1; }
 done
 

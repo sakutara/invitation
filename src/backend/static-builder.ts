@@ -10,10 +10,27 @@ import { renderIndexPage } from '../frontend/templates/index.template';
 import { renderRsvpPage } from '../frontend/templates/rsvp.template';
 import { renderInvitePage } from '../frontend/templates/invite.template';
 import { buildIcs } from '../shared/wedding-calendar';
+import { LEGACY_PAGES, PAGE_DIRS } from '../shared/routes';
 
 export const PROJECT_ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const FRONTEND = join(PROJECT_ROOT, 'src/frontend');
 const SCRIPT_ENTRIES = ['index', 'rsvp', 'invite'];
+
+/** Stub at an old page address: forwards to the folder URL keeping ?khach=… and #… (static hosting has no 301s). */
+export function redirectPage(target: string): string {
+  return `<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<title>Đang chuyển trang…</title>
+<script>location.replace(${JSON.stringify(target)} + location.search + location.hash)</script>
+<meta http-equiv="refresh" content="0; url=${target}">
+</head>
+<body><a href="${target}">Tiếp tục</a></body>
+</html>
+`;
+}
 
 export interface BuildReport {
   durationMs: number;
@@ -84,7 +101,7 @@ export class StaticBuilder {
   async build(data: WeddingData): Promise<BuildReport> {
     const t0 = performance.now();
     const dist = this.distDir;
-    await Promise.all(['assets/data', 'assets/css', 'assets/js', 'assets/images'].map((d) => mkdir(join(dist, d), { recursive: true })));
+    await Promise.all(['assets/data', 'assets/css', 'assets/js', 'assets/images', ...Object.values(PAGE_DIRS)].map((d) => mkdir(join(dist, d), { recursive: true })));
 
     const publicData: PublicWeddingData = {
       config: data.config,
@@ -95,8 +112,9 @@ export class StaticBuilder {
     };
     const files: Record<string, string> = {
       'index.html': renderIndexPage(publicData),
-      'rsvp.html': renderRsvpPage(publicData),
-      'invite.html': renderInvitePage(publicData),
+      [`${PAGE_DIRS.rsvp}index.html`]: renderRsvpPage(publicData),
+      [`${PAGE_DIRS.invite}index.html`]: renderInvitePage(publicData),
+      ...Object.fromEntries(Object.entries(LEGACY_PAGES).map(([file, target]) => [file, redirectPage(target)])),
       'assets/data/wedding-data.json': JSON.stringify(publicData, null, 2),
       'assets/data/guests-map.json': JSON.stringify(buildGuestsMapSync(data.guests)),
       'assets/data/wedding.ics': buildIcs(data.config),

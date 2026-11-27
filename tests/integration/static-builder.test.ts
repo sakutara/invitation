@@ -10,7 +10,7 @@ import { DEFAULT_CONFIG } from '../../src/shared/default-config';
 import { SEATING_ZONES, type PhotoRecord } from '../../src/shared/types';
 
 let root: string;
-const OUTPUTS = ['index.html', 'rsvp.html', 'invite.html', 'assets/data/wedding-data.json', 'assets/data/guests-map.json'];
+const OUTPUTS = ['index.html', 'thiep-moi/index.html', 'dang-ky/index.html', 'rsvp.html', 'invite.html', 'assets/data/wedding-data.json', 'assets/data/guests-map.json'];
 const readJson = (p: string) => JSON.parse(readFileSync(p, 'utf8'));
 
 function fakePhoto(id: string, sortOrder: number, mediaDir?: string): PhotoRecord {

@@ -1,6 +1,7 @@
 # Wedding Webapp
 
-Local CMS (SQLite) → auto-built static site in `dist/` (`index.html`, `rsvp.html`, `invite.html`).
+Local CMS (SQLite) → auto-built static site in `dist/` (`/` → `index.html`, `/thiep-moi/`, `/dang-ky/`;
+the old `invite.html` / `rsvp.html` only redirect, keeping `?khach=…`).
 Specs: `openspec/`, domain rules: `okf/`, plan: `PLAN.md`.
 
 ## Commands

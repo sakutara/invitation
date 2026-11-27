@@ -15,9 +15,13 @@ export function documentShell(opts: {
   body: string;
   ogImage?: string | null;
   head?: string;
+  /** Path from this page to the site root ('' for the home page, '../' inside a folder). */
+  root?: string;
 }): string {
   const { config } = opts;
-  const og = opts.ogImage ? `<meta property="og:image" content="${escapeHtml(joinUrl(config.siteBaseUrl, opts.ogImage))}">` : '';
+  const root = opts.root ?? '';
+  // og:image must be absolute: drop the page-relative prefix before joining with the site address.
+  const og = opts.ogImage ? `<meta property="og:image" content="${escapeHtml(joinUrl(config.siteBaseUrl, opts.ogImage.replace(/^(\.\.\/)+/, '')))}">` : '';
   return `<!doctype html>
 <html lang="vi" class="no-js">
 <head>
@@ -33,9 +37,9 @@ ${og}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="${FONTS_HREF}">
-<link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="${root}assets/css/main.css">
 ${opts.head ?? ''}
-<script type="module" src="assets/js/${opts.script}"></script>
+<script type="module" src="${root}assets/js/${opts.script}"></script>
 </head>
 <body class="${opts.bodyClass}">
 ${opts.body}
