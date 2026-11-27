@@ -137,6 +137,15 @@ const MIME: Record<string, string> = {
   '.webp': 'image/webp',
   '.png': 'image/png',
   '.svg': 'image/svg+xml',
+  '.mp3': 'audio/mpeg',
+  '.m4a': 'audio/mp4',
+  '.aac': 'audio/aac',
+  '.ogg': 'audio/ogg',
+  '.oga': 'audio/ogg',
+  '.opus': 'audio/ogg',
+  '.wav': 'audio/wav',
+  '.webm': 'audio/webm',
+  '.flac': 'audio/flac',
 };
 
 export async function serveStatic(rootDir: string, relPath: string, res: ServerResponse): Promise<boolean> {
@@ -155,7 +164,22 @@ export async function serveStatic(rootDir: string, relPath: string, res: ServerR
     }
     const file = s.isDirectory() ? join(target, 'index.html') : target;
     const data = await readFile(file);
-    res.writeHead(200, { 'content-type': MIME[extname(file).toLowerCase()] ?? 'application/octet-stream', 'cache-control': 'no-cache' });
+    const type = MIME[extname(file).toLowerCase()] ?? 'application/octet-stream';
+    // Safari only plays audio/video from servers that honour byte ranges.
+    const range = /^bytes=(\d*)-(\d*)$/.exec(String(res.req?.headers.range ?? ''));
+    if (range && (range[1] || range[2])) {
+      const size = data.length;
+      const start = range[1] ? Number(range[1]) : Math.max(0, size - Number(range[2]));
+      const end = range[1] && range[2] ? Math.min(size - 1, Number(range[2])) : size - 1;
+      if (start >= size || start > end) {
+        res.writeHead(416, { 'content-range': `bytes */${size}` }).end();
+        return true;
+      }
+      res.writeHead(206, { 'content-type': type, 'accept-ranges': 'bytes', 'content-range': `bytes ${start}-${end}/${size}`, 'content-length': String(end - start + 1), 'cache-control': 'no-cache' });
+      res.end(data.subarray(start, end + 1));
+      return true;
+    }
+    res.writeHead(200, { 'content-type': type, 'accept-ranges': 'bytes', 'cache-control': 'no-cache' });
     res.end(data);
     return true;
   } catch {
@@ -408,6 +432,7 @@ export async function main() {
   const { createBulkRoutes } = await import('./bulk-studio');
   const { createSeatingRoutes } = await import('./seating-routes');
   const { createMapPreview } = await import('./map-preview');
+  const { createMusicRoutes } = await import('./music-routes');
   const cms = await createCms({
     dbPath: process.env.WEDDING_DB ?? join(PROJECT_ROOT, 'data/wedding.db'),
     distDir: process.env.WEDDING_DIST ?? join(PROJECT_ROOT, 'dist'),
@@ -423,7 +448,7 @@ export async function main() {
     cms,
     auth,
     onConfigSaved: mapPreview.onConfigSaved,
-    extraRoutes: [...createSeatingRoutes({ cms }), ...mapPreview.routes, ...createBulkRoutes({ cms, outputDir: join(PROJECT_ROOT, 'output/invitations-jpg') })],
+    extraRoutes: [...createSeatingRoutes({ cms }), ...createMusicRoutes({ cms }), ...mapPreview.routes, ...createBulkRoutes({ cms, outputDir: join(PROJECT_ROOT, 'output/invitations-jpg') })],
   });
   server.listen(port, host, async () => {
     if (!auth) {

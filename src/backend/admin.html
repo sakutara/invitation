@@ -18,6 +18,7 @@
   <nav class="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-3 pb-2 text-sm [scrollbar-width:none]" aria-label="Mục quản lý">
     <a class="shrink-0 rounded-full px-3 py-1.5 text-ivory/80 no-underline hover:bg-white/10 hover:text-white" href="#config-section">Nội dung</a>
     <a class="shrink-0 rounded-full px-3 py-1.5 text-ivory/80 no-underline hover:bg-white/10 hover:text-white" href="#photos-section">Ảnh cưới</a>
+    <a class="shrink-0 rounded-full px-3 py-1.5 text-ivory/80 no-underline hover:bg-white/10 hover:text-white" href="#playlist-section">Nhạc nền</a>
     <a class="shrink-0 rounded-full px-3 py-1.5 text-ivory/80 no-underline hover:bg-white/10 hover:text-white" href="#seating-section">Sơ đồ bàn</a>
     <a class="shrink-0 rounded-full px-3 py-1.5 text-ivory/80 no-underline hover:bg-white/10 hover:text-white" href="#bulk-section">Thiệp mời</a>
   </nav>
@@ -34,6 +35,11 @@
   <section id="photos-section" class="card scroll-mt-28">
     <h2 class="card-title">Ảnh cưới</h2>
     <div id="photos-root"></div>
+  </section>
+
+  <section id="playlist-section" class="card scroll-mt-28">
+    <h2 class="card-title">Nhạc nền</h2>
+    <div id="playlist-root"></div>
   </section>
 
   <section id="seating-section" class="card scroll-mt-28">
@@ -57,6 +63,7 @@ import { $, api, busy, esc } from '/admin/common.js';
 import * as configForm from '/admin/config-form.js';
 import * as photos from '/admin/photos.js';
 import * as seating from '/admin/seating-editor.js';
+import * as playlist from '/admin/playlist.js';
 
 const STATUS_CLASS = { GENERATED: 'bg-sky-100 text-sky-800', SENT: 'bg-green-100 text-green-800', PENDING: 'bg-pink-100 text-pink-800' };
 async function loadGuests() {
@@ -110,7 +117,7 @@ $('email').onclick = (e) => busy(e.target, $('bulk-status'), async () => {
   return `Đã gửi ${r.sent} email` + (r.failed.length ? ` · lỗi ${r.failed.length}` : '');
 });
 
-for (const [name, m] of Object.entries({ configForm, photos, seating })) m.init().catch((e) => console.error(`[admin] ${name} failed`, e));
+for (const [name, m] of Object.entries({ configForm, photos, playlist, seating })) m.init().catch((e) => console.error(`[admin] ${name} failed`, e));
 loadGuests().catch(() => {});
 </script>
 </body>

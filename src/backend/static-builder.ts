@@ -106,6 +106,7 @@ export class StaticBuilder {
     const publicData: PublicWeddingData = {
       config: data.config,
       photos: data.photos,
+      playlist: data.playlist ?? [],
       seatingZones: data.seatingZones,
       seatingLayout: data.seatingLayout ?? null,
       builtAt: new Date().toISOString(),
@@ -127,6 +128,7 @@ export class StaticBuilder {
     await Promise.all(Object.entries(files).map(([rel, content]) => writeAtomic(join(dist, rel), content)));
     await this.syncImages(data);
     await this.syncMaps();
+    await this.syncMusic(data);
     return { durationMs: performance.now() - t0, files: Object.keys(files) };
   }
 
@@ -143,6 +145,22 @@ export class StaticBuilder {
       if (!names.has(e.name)) await rm(join(dest, e.name), { recursive: true, force: true });
     }
     await Promise.all(wanted.map((name) => cp(join(src, name), join(dest, name)).catch(() => {})));
+  }
+
+  /** Mirrors the playlist's audio files (<mediaDir>/_music/) into dist/assets/music/, dropping removed tracks. */
+  private async syncMusic(data: WeddingData) {
+    const src = join(this.mediaDir, '_music');
+    const dest = join(this.distDir, 'assets/music');
+    await mkdir(dest, { recursive: true });
+    const wanted = new Set((data.playlist ?? []).map((t) => t.src.split('/').pop()!));
+    for (const e of await readdir(dest, { withFileTypes: true })) {
+      if (!wanted.has(e.name)) await rm(join(dest, e.name), { recursive: true, force: true });
+    }
+    await Promise.all(
+      [...wanted].map(async (name) => {
+        if (existsSync(join(src, name)) && !existsSync(join(dest, name))) await cp(join(src, name), join(dest, name));
+      }),
+    );
   }
 
   private async syncImages(data: WeddingData) {

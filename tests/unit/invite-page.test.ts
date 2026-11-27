@@ -36,13 +36,19 @@ describe('invite.html template', () => {
     expect(q('[data-role="presence"]').textContent).toBe('Sự hiện diện của Quý vị\nlà niềm vinh hạnh cho gia đình chúng tôi!');
   });
 
-  it('shows both printed cards: party (venue, time, lunar date, families) and ceremony', () => {
+  it('opens two sheets: the photo and the full invitation (venue, time, lunar date, families)', () => {
+    expect(document.querySelectorAll('#envelope .env-sheet')).toHaveLength(2);
+    expect(text('.env-sheet--photo .letter-card__title')).toBe('Thiệp Mời');
     const main = text('.paper-card--main');
     for (const s of [DEFAULT_CONFIG.reception.venueName, DEFAULT_CONFIG.reception.address, 'Vào lúc', '16.01.2027', 'Tức ngày 9 tháng 12 năm Bính Ngọ', DEFAULT_CONFIG.groomParents.father, DEFAULT_CONFIG.brideParents.mother])
       expect(main, s).toContain(s);
-    const ceremony = text('.paper-card--ceremony');
-    for (const s of [DEFAULT_CONFIG.ceremony.title, DEFAULT_CONFIG.ceremony.venueName, 'Rất hân hạnh được đón tiếp!']) expect(ceremony, s).toContain(s);
-    expect(text('.pc-wreath__mono')).toBe('QH');
+  });
+
+  it('lists the ceremony and the party with their venues next to the calendar', () => {
+    const events = text('#events');
+    for (const s of [DEFAULT_CONFIG.ceremony.title, DEFAULT_CONFIG.ceremony.venueName, DEFAULT_CONFIG.reception.title, '09:00', '18:00']) expect(events, s).toContain(s);
+    expect(q('#events #calendar .calendar__cell--day')).not.toBeNull();
+    for (const id of ['family', 'story', 'gallery', 'rsvp-cta']) expect(q(`#${id}`), id).toBeNull();
   });
 
   it('has no directions or RSVP section (the guest already replied), but a full schedule with Google Maps', () => {

@@ -4,8 +4,8 @@ import { formatViDateTime } from '../../shared/date-format';
 import { mapSeating, renderSeatingMapSvg } from '../../shared/seating-mapper';
 import { FALLBACK_GUEST, type WeddingData } from '../../shared/types';
 import { rebaseAssets, SUBPAGE_ROOT } from '../../shared/routes';
-import { documentShell, eventCard, firstPhoto, ornament, variant } from './partials';
-import { calendarSection, closingSection, countdownSection, envelopeScene, invitationCards, sheet } from './envelope.partials';
+import { blossom, documentShell, firstPhoto, ornament, variant } from './partials';
+import { closingSection, countdownSection, envelopeScene, musicPlayer, sceneLead, scheduleSection } from './envelope.partials';
 
 type PageData = Omit<WeddingData, 'guests'> & { builtAt?: string };
 
@@ -23,31 +23,17 @@ export function renderInvitePage(input: PageData): string {
 
   const body = `
 <main>
-${envelopeScene(config, photos)}
-<div class="paper-desk">
-${sheet('invite-hero', 'sheet--pair', `
-      <div class="container">
-        ${invitationCards(config)}
-        <div class="hero__actions">
-          <a class="btn" href="#card">Lưu thiệp JPG</a>
-          <a class="btn btn--navy" href="#seating">Xem chỗ ngồi</a>
-        </div>
-      </div>`)}
-${calendarSection(config, SUBPAGE_ROOT)}
-${countdownSection(config, photos)}
-${sheet('events', 'schedule-sheet', `
-      ${ornament('tl')}
-      <div class="container" data-parallax-speed="0">
-        <span class="eyebrow">Thông tin hôn lễ</span>
-        <h2 class="section-title">Lịch trình</h2>
-        <div class="events tickets">${eventCard(config.ceremony, config.googleMapsUrl)}${eventCard(config.reception, config.googleMapsUrl)}</div>
-      </div>`)}
-${sheet('seating', 'seating-sheet', `
-      ${ornament('br')}
-      <div class="container" data-parallax-speed="0">
-        <span class="eyebrow">Sơ đồ bàn tiệc</span>
-        <h2 class="section-title" data-role="seating-title">Sơ đồ khu vực tiệc</h2>
-      <div class="seating">
+${envelopeScene(config, photos, { hasMusic: !!data.playlist?.length })}
+<div class="page-paper">
+${sceneLead(config, `<a class="btn" href="#card">Lưu thiệp JPG</a>
+        <a class="btn btn--navy" href="#seating">Xem chỗ ngồi</a>`)}
+${scheduleSection(config, photos, { root: SUBPAGE_ROOT, withMaps: true, id: 'events' })}
+  <section id="seating" class="section seating-section" data-scroll-progress data-scroll-span="1">
+    ${ornament('br')}
+    <div class="container" data-parallax-speed="0">
+      <span class="eyebrow rise" style="--d:0">Sơ đồ bàn tiệc</span>
+      <h2 class="section-title rise" style="--d:.05" data-role="seating-title">Sơ đồ khu vực tiệc</h2>
+      <div class="seating rise" style="--d:.12">
         <div class="seating__map">${renderSeatingMapSvg(seatingZones, { zoneId: null, layout: data.seatingLayout })}</div>
         <div class="seating__info" hidden>
           <p class="seating__zone" data-role="zone-name">${escapeHtml(fallbackSeat.zone.nameVi)}</p>
@@ -55,11 +41,14 @@ ${sheet('seating', 'seating-sheet', `
           <p class="seating__guidance" data-role="seat-guidance">${escapeHtml(fallbackSeat.guidance)}</p>
         </div>
       </div>
-      </div>`)}
-${sheet('card', 'card-sheet', `
+    </div>
+  </section>
+${countdownSection(config, photos)}
+  <section id="card" class="section card-section" data-scroll-progress data-scroll-span="1">
+    ${blossom('card-section__blossom', 'wine')}
     <div class="container save-card">
-      <div class="save-card__preview"><img alt="Thiệp mời cá nhân hoá" width="1080" height="1620"></div>
-      <div>
+      <div class="save-card__preview rise" style="--d:0"><img alt="Thiệp mời cá nhân hoá" width="1080" height="1620"></div>
+      <div class="rise" style="--d:.1">
         <span class="eyebrow" style="text-align:left">Thiệp mời của bạn</span>
         <h2 class="section-title" style="text-align:left">Lưu &amp; chia sẻ thiệp</h2>
         <p>Tải thiệp mời (ảnh JPG 1080×1620) về máy hoặc chia sẻ ngay qua Zalo, Messenger.</p>
@@ -69,12 +58,14 @@ ${sheet('card', 'card-sheet', `
         </div>
         <p class="save-card__status" role="status"></p>
       </div>
-    </div>`)}
+    </div>
+  </section>
 ${closingSection(config)}
 </div>
 </main>
 <footer class="site-footer">${groom} &amp; ${bride} · ${escapeHtml(wedding.date)}</footer>
-<script type="application/json" id="wedding-data">${jsonForScript(publicData)}</script>`;
+<script type="application/json" id="wedding-data">${jsonForScript(publicData)}</script>
+${musicPlayer(data.playlist, SUBPAGE_ROOT)}`;
 
   return documentShell({
     config,

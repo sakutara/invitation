@@ -3,7 +3,8 @@ import { describe, it, expect } from 'vitest';
 import { monthGrid, buildIcs, toIcsUtc, googleCalendarUrl } from '../../src/shared/wedding-calendar';
 import { sceneProgress, phaseValues, entryProgress, ENVELOPE_PHASES } from '../../src/frontend/scripts/scroll-scene';
 import { countdownParts } from '../../src/frontend/scripts/invite';
-import { sheetEnd, sheetIn, sheetStickyTop } from '../../src/frontend/scripts/sheet-stack';
+import { follow } from '../../src/frontend/scripts/scroll-scene';
+import { nextIndex } from '../../src/frontend/scripts/music';
 import { lunarLine, solarToLunar, canChiYear } from '../../src/shared/lunar-calendar';
 import { guestNameLine, presenceLine } from '../../src/shared/invitation-formatter';
 import { DEFAULT_CONFIG, DEFAULT_INVITATION, defaultMonogram, resolveInvitation } from '../../src/shared/default-config';
@@ -46,12 +47,14 @@ describe('scroll scene math', () => {
     expect(sceneProgress(-5000, 3800, 1000)).toBe(1);
     expect(sceneProgress(200, 3800, 1000)).toBe(0);
   });
-  it('runs the phases in order: cover lifts, flap opens, then the card slides out', () => {
+  it('runs the phases in order: cover lifts, flap opens, sheets rise, fan out, come forward', () => {
     const at = (p: number) => phaseValues(p);
-    expect(at(0)).toMatchObject({ cover: 0, flap: 0, card: 0 });
-    expect(at(0.3)).toMatchObject({ cover: 1, card: 0 });
-    expect(at(0.3).flap).toBeGreaterThan(0);
-    expect(at(0.5)).toMatchObject({ flap: 1 });
+    expect(at(0)).toMatchObject({ cover: 0, flap: 0, rise: 0, fan: 0, read: 0 });
+    expect(at(0.2)).toMatchObject({ cover: 1, rise: 0 });
+    expect(at(0.2).flap).toBeGreaterThan(0);
+    expect(at(0.4)).toMatchObject({ flap: 1, fan: 0 });
+    expect(at(0.4).rise).toBeGreaterThan(0.5);
+    expect(at(0.7)).toMatchObject({ rise: 1, fan: 1 });
     expect(at(1)).toEqual(Object.fromEntries(Object.keys(ENVELOPE_PHASES).map((k) => [k, 1])));
   });
   it('entry progress grows as the element rises into view', () => {
@@ -101,76 +104,46 @@ describe('index.html envelope', () => {
     const html = renderIndexPage({ config: DEFAULT_CONFIG, photos: [], seatingZones: SEATING_ZONES });
     document.documentElement.innerHTML = html.replace(/^[\s\S]*?<html[^>]*>/, '').replace(/<\/html>\s*$/, '');
     expect([...document.querySelectorAll('main > section')].map((s) => s.id)).toEqual(['envelope']);
-    const ids = [...document.querySelectorAll('main > .paper-desk > section[data-sheet]')].map((s) => s.id);
-    expect(ids.slice(0, 2)).toEqual(['hero', 'story']);
-    for (const id of ['calendar', 'countdown', 'rsvp-cta', 'closing']) expect(ids).toContain(id);
+    const ids = [...document.querySelectorAll('main > .page-paper > section')].map((s) => s.id);
+    for (const id of ['schedule', 'countdown', 'rsvp-cta']) expect(ids).toContain(id);
+    expect(document.getElementById('calendar')).not.toBeNull();
+    expect(document.getElementById('closing')).not.toBeNull();
     expect(document.querySelectorAll('h1')).toHaveLength(1);
     expect(document.querySelector('.calendar__cell--day .calendar__heart')).not.toBeNull();
     expect(document.querySelector('#rsvp-cta a[data-cta="rsvp-bottom"]')!.getAttribute('href')).toBe('dang-ky/');
   });
 });
 
-describe('sheet stack', () => {
-  it('slides a sheet in while its top rises from the viewport bottom to 20% of the viewport', () => {
-    expect(sheetIn(1000, 1000)).toBe(0);
-    expect(sheetIn(600, 1000)).toBe(0.5);
-    expect(sheetIn(200, 1000)).toBe(1);
-    expect(sheetIn(-900, 1000)).toBe(1);
+describe('scroll scene', () => {
+  it('maps the sticky travel to 0..1', () => {
+    expect(sceneProgress(0, 5000, 1000)).toBe(0);
+    expect(sceneProgress(-2000, 5000, 1000)).toBe(0.5);
+    expect(sceneProgress(-9000, 5000, 1000)).toBe(1);
   });
-  it('runs the last sheet to 1 exactly at the end of the page', () => {
-    // last sheet's top at 900 in a 1000px viewport; the page can still scroll 500px, after which its top sits at 400
-    expect(sheetEnd(1000, 1000, 2000, 2500)).toBe(0);
-    expect(sheetEnd(700, 1000, 2200, 2500)).toBe(0.5);
-    expect(sheetEnd(400, 1000, 2500, 2500)).toBe(1);
-  });
-  it('sticks short sheets at the top and tall sheets once their bottom meets the viewport bottom', () => {
-    expect(sheetStickyTop(800, 1000)).toBe(0);
-    expect(sheetStickyTop(1600, 1000)).toBe(-600);
-  });
-  it('wraps every section below the envelope in a sheet on both pages', () => {
-    const pages = [
-      renderIndexPage({ config: DEFAULT_CONFIG, photos: [], seatingZones: SEATING_ZONES }),
-      renderInvitePage({ config: DEFAULT_CONFIG, photos: [], seatingZones: SEATING_ZONES }),
-    ];
-    for (const html of pages) {
-      document.documentElement.innerHTML = html.replace(/^[\s\S]*?<html[^>]*>/, '').replace(/<\/html>\s*$/, '');
-      const sheets = document.querySelectorAll('[data-sheet]');
-      expect(sheets.length).toBeGreaterThanOrEqual(6);
-      for (const s of sheets) expect(s.firstElementChild!.classList.contains('sheet')).toBe(true);
-      expect(document.querySelector('.closing-env .closing-card')).not.toBeNull();
+  it('overlaps the phases so the motion never pauses between them', () => {
+    const at = (p: number) => phaseValues(p);
+    expect(at(0).cover).toBe(0);
+    expect(at(1)).toEqual({ cover: 1, stage: 1, flap: 1, rise: 1, fan: 1, read: 1 });
+    // somewhere between 0 and 0.9 at least one phase is always in motion
+    for (let p = 0.005; p < 0.9; p += 0.01) {
+      const v = Object.values(at(p));
+      expect(v.some((x) => x > 0 && x < 1), String(p)).toBe(true);
     }
-    document.documentElement.innerHTML = pages[0].replace(/^[\s\S]*?<html[^>]*>/, '').replace(/<\/html>\s*$/, '');
-    expect(document.querySelectorAll('.tickets .event')).toHaveLength(1);
-    expect(document.querySelector('.reply .reply__card a[href="dang-ky/"]')).not.toBeNull();
-    document.documentElement.innerHTML = pages[1].replace(/^[\s\S]*?<html[^>]*>/, '').replace(/<\/html>\s*$/, '');
-    // invite.html: the printed cards carry the details; no directions, no RSVP (guests already replied)
-    expect(document.querySelectorAll('.card-pair .paper-card')).toHaveLength(2);
-    for (const id of ['directions', 'rsvp-cta']) expect(document.getElementById(id), id).toBeNull();
-    expect(document.querySelector('.letter-card__title')!.textContent).toBe('Thiệp Mời');
-    // full schedule with Google Maps, right above the seating plan
-    const ids = [...document.querySelectorAll('[data-sheet]')].map((s) => s.id);
-    expect(ids.indexOf('events')).toBe(ids.indexOf('seating') - 1);
-    expect(document.querySelectorAll('#events .event a[href*="maps"]').length).toBeGreaterThanOrEqual(2);
+  });
+  it('eases toward the scroll target frame by frame', () => {
+    const a = follow(0, 1, 16);
+    expect(a).toBeGreaterThan(0);
+    expect(a).toBeLessThan(1);
+    expect(follow(a, 1, 16)).toBeGreaterThan(a);
+    expect(follow(0.9998, 1, 16)).toBe(1);
+    expect(follow(0, 1, 1000)).toBe(1);
   });
 });
 
-describe('lunar date', () => {
-  it('matches the printed card: 17/01/2027 = 10 tháng 12 năm Bính Ngọ', () => {
-    expect(lunarLine('2027-01-17T16:30:00+07:00')).toBe('Tức ngày 10 tháng 12 năm Bính Ngọ');
-  });
-  it('knows Tết and leap months', () => {
-    expect(solarToLunar(17, 2, 2026)).toEqual({ day: 1, month: 1, year: 2026, leap: false });
-    expect(lunarLine('2023-03-22')).toBe('Tức ngày 1 tháng 2 nhuận năm Quý Mão');
-    expect(canChiYear(2027)).toBe('Đinh Mùi');
-    expect(lunarLine('')).toBe('');
-  });
-});
-
-describe('printed-card wording', () => {
-  it('puts the guest on the dotted line and their salutation in the presence line', () => {
-    expect(guestNameLine({ name: 'vợ chồng chú Chín' })).toBe('vợ chồng chú Chín');
-    expect(guestNameLine(null)).toBe('Quý khách');
-    expect(presenceLine('Sự hiện diện của {khach}', { salutation: 'Chú thím' })).toBe('Sự hiện diện của chú thím');
-    expect(presenceLine('Sự hiện diện của {khach}', null)).toBe('Sự hiện diện của Quý vị');
+describe('music', () => {
+  it('loops the playlist', () => {
+    expect(nextIndex(0, 3)).toBe(1);
+    expect(nextIndex(2, 3)).toBe(0);
+    expect(nextIndex(0, 0)).toBe(0);
   });
 });

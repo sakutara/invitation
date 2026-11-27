@@ -15,6 +15,9 @@ npm run test:e2e   # Playwright, Mobile 390x844 + FullHD 1920x1080
 npm run typecheck
 ```
 
+Background music: upload tracks in the CMS (**Nhạc nền**). They are copied to `dist/assets/music/` and play in
+order on the announcement and invitation pages (browsers that block autoplay start on the first tap).
+
 Deploy by uploading `dist/` to any static host. `data/` (SQLite, original photos) stays on your machine.
 
 ## Google Sheets (RSVP + guest roster)

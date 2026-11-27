@@ -1,5 +1,5 @@
 /** Shared HTML partials for the three static pages. */
-import { floralPaths } from '../../shared/florals';
+import { blossomPaths, bouquetPaths, floralPaths } from '../../shared/florals';
 import { FONTS_HREF } from '../../shared/web-fonts';
 import { escapeHtml } from '../../shared/html';
 import { formatViDateTime } from '../../shared/date-format';
@@ -87,6 +87,17 @@ const FLIP = { none: '', h: 'matrix(-1 0 0 1 220 0)', v: 'matrix(1 0 0 -1 0 220)
 export function floralSpray(cls = '', attrs = '', flip: keyof typeof FLIP = 'none'): string {
   const inner = FLIP[flip] ? `<g transform="${FLIP[flip]}">${floralPaths()}</g>` : floralPaths();
   return `<svg class="floral ${cls}"${attrs} viewBox="0 0 220 220" fill="none" aria-hidden="true">${inner}</svg>`;
+}
+
+/** Hand-tied bouquet (blush roses, yellow blooms, bow). */
+export function bouquet(cls = '', attrs = ''): string {
+  return `<svg class="floral floral--bouquet ${cls}"${attrs} viewBox="0 0 200 280" fill="none" aria-hidden="true">${bouquetPaths()}</svg>`;
+}
+
+/** Single inked flower (dusty blue by default, or wine/blush). */
+export function blossom(cls = '', tone: 'blue' | 'wine' | 'lavender' = 'blue', attrs = ''): string {
+  const [ink, wash] = { blue: ['#5A7BA6', '#C9D6EA'], wine: ['#8E2F45', '#F3C9D3'], lavender: ['#7067A8', '#D7D2F0'] }[tone];
+  return `<svg class="floral floral--blossom ${cls}"${attrs} viewBox="0 0 120 120" fill="none" aria-hidden="true">${blossomPaths(ink, wash)}</svg>`;
 }
 
 /** Corner florals; kept under the parallax ornament contract (data-parallax-speed="-0.15"). */

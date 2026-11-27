@@ -275,9 +275,20 @@ export interface GuestRecord {
   status?: 'PENDING' | 'GENERATED' | 'SENT';
 }
 
+/** One background-music track (uploaded in the CMS, played in order on the public pages). */
+export interface MusicTrack {
+  id: string;
+  title: string;
+  /** Path relative to dist/ (e.g. assets/music/track-ab12cd34.mp3) */
+  src: string;
+  sortOrder: number;
+}
+
 export interface WeddingData {
   config: WeddingConfig;
   photos: PhotoRecord[];
+  /** Background music playlist; empty = no music player on the pages. */
+  playlist?: MusicTrack[];
   seatingZones: SeatingZone[];
   /** Visual floor plan; null = legacy zone-only rendering. */
   seatingLayout?: SeatingLayout | null;

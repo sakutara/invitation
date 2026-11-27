@@ -1,6 +1,6 @@
-/** Shared runtime of the envelope pages (index.html, invite.html): scroll scenes, wax-seal tap, countdown. */
+/** Shared runtime of the envelope pages (index.html, thiep-moi/): scroll scenes, wax-seal tap, countdown, music. */
 import { initScrollScenes, scrollSceneTo } from './scroll-scene';
-import { initSheetStack } from './sheet-stack';
+import { initMusic } from './music';
 
 /** d/h/m/s left until `target` (all zero once it has passed). */
 export function countdownParts(target: number, now: number): { days: number; hours: number; minutes: number; seconds: number; done: boolean } {
@@ -30,15 +30,15 @@ export function initCountdown(doc: Document = document, now: () => number = Date
   return () => clearInterval(timer);
 }
 
-/** Tapping the wax seal scrolls the envelope scene to its opened state. */
+/** Tapping the wax seal scrolls the envelope scene to its opened state (both sheets out, ready to read). */
 export function initEnvelope(doc: Document = document): void {
   const scene = doc.querySelector<HTMLElement>('[data-scroll-scene]');
-  doc.querySelector('[data-role="open-envelope"]')?.addEventListener('click', () => scene && scrollSceneTo(scene, 0.86, doc.defaultView ?? window));
+  doc.querySelector('[data-role="open-envelope"]')?.addEventListener('click', () => scene && scrollSceneTo(scene, 0.93, doc.defaultView ?? window));
 }
 
 export function initEnvelopePage(doc: Document = document): void {
   initScrollScenes(doc, doc.defaultView ?? window);
-  initSheetStack(doc, doc.defaultView ?? window);
   initEnvelope(doc);
   initCountdown(doc);
+  initMusic(doc);
 }

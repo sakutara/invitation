@@ -4,9 +4,9 @@ import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { assignGuestSlugs } from '../shared/guest-codec';
 import { DEFAULT_CONFIG } from '../shared/default-config';
-import { SEATING_ZONES, type CropRect, type GuestRecord, type SeatingLayout, type PhotoRecord, type SeatingZone, type WeddingConfig, type WeddingData } from '../shared/types';
+import { SEATING_ZONES, type CropRect, type GuestRecord, type MusicTrack, type SeatingLayout, type PhotoRecord, type SeatingZone, type WeddingConfig, type WeddingData } from '../shared/types';
 
-export type MutationTable = 'config' | 'photos' | 'seating_zones' | 'seating_layout' | 'guests';
+export type MutationTable = 'config' | 'photos' | 'seating_zones' | 'seating_layout' | 'guests' | 'playlist';
 
 export interface WeddingDbOptions {
   onMutation?: (table: MutationTable) => void;
@@ -37,6 +37,7 @@ export class WeddingDb {
     this.db.prepare('INSERT OR IGNORE INTO kv (key, value) VALUES (?, ?)').run('config', JSON.stringify(DEFAULT_CONFIG));
     this.db.prepare('INSERT OR IGNORE INTO kv (key, value) VALUES (?, ?)').run('seating_zones', JSON.stringify(SEATING_ZONES));
     this.db.prepare('INSERT OR IGNORE INTO kv (key, value) VALUES (?, ?)').run('seating_layout', 'null');
+    this.db.prepare('INSERT OR IGNORE INTO kv (key, value) VALUES (?, ?)').run('playlist', '[]');
     const cols = (this.db.prepare('PRAGMA table_info(photos)').all() as Row[]).map((c) => String(c.name));
     if (!cols.includes('crop')) this.db.exec('ALTER TABLE photos ADD COLUMN crop TEXT');
   }
@@ -83,6 +84,18 @@ export class WeddingDb {
     this.setKv('seating_layout', layout);
     this.emit('seating_layout');
     return layout;
+  }
+
+  /** Background music, in play order. */
+  getPlaylist(): MusicTrack[] {
+    return [...this.getKv<MusicTrack[]>('playlist')].sort((a, b) => a.sortOrder - b.sortOrder);
+  }
+
+  setPlaylist(tracks: MusicTrack[]): MusicTrack[] {
+    const next = tracks.map((t, i) => ({ ...t, sortOrder: i }));
+    this.setKv('playlist', next);
+    this.emit('playlist');
+    return next;
   }
 
   private toPhoto(r: Row): PhotoRecord {
@@ -181,7 +194,7 @@ export class WeddingDb {
   }
 
   snapshot(): WeddingData {
-    return { config: this.getConfig(), photos: this.listPhotos(), seatingZones: this.getSeatingZones(), seatingLayout: this.getSeatingLayout(), guests: this.listGuests() };
+    return { config: this.getConfig(), photos: this.listPhotos(), playlist: this.getPlaylist(), seatingZones: this.getSeatingZones(), seatingLayout: this.getSeatingLayout(), guests: this.listGuests() };
   }
 
   close() {
