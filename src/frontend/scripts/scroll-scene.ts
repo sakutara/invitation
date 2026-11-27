@@ -15,12 +15,12 @@ export const easeSine = (t: number) => 0.5 - Math.cos(Math.PI * t) / 2;
 
 /** Envelope phases as [start, end] fractions of the scene progress. Neighbouring phases overlap, so motion never stops between them. */
 export const ENVELOPE_PHASES: Record<string, [number, number]> = {
-  cover: [0.0, 0.13], // closed envelope cover lifts away
-  stage: [0.03, 0.17], // the open-able envelope settles in the middle
-  flap: [0.14, 0.3], // flap swings open
-  rise: [0.25, 0.48], // both sheets and the record slide up out of the pocket
-  fan: [0.42, 0.68], // they spread apart while the envelope sinks lower
-  read: [0.64, 0.9], // the envelope sinks away, the sheets come forward to be read
+  cover: [0, 0.1], // closed envelope cover lifts away
+  stage: [0.02, 0.13], // the open-able envelope settles in the middle
+  flap: [0.1, 0.22], // flap swings open
+  rise: [0.2, 0.38], // both sheets slide straight up, still lying sideways, until fully out of the envelope (which sinks)
+  fan: [0.36, 0.54], // they turn upright and spread apart
+  read: [0.52, 0.72], // they come forward to be read; 0.72..1 holds the final state
 };
 
 /** Progress of a sticky scene: 0 when its top reaches the viewport top, 1 when its bottom reaches the viewport bottom. */

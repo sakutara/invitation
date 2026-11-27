@@ -1,10 +1,9 @@
 /** Trang Báo Hỉ — dist/index.html */
-import { PAGE_DIRS } from '../../shared/routes';
 import { escapeHtml } from '../../shared/html';
 import { formatViDateTime } from '../../shared/date-format';
 import type { WeddingData } from '../../shared/types';
 import { documentShell, firstPhoto, picture, variant } from './partials';
-import { countdownSection, envelopeScene, familiesSection, musicPlayer, rsvpCtaSection, sceneLead, scheduleSection, storySection } from './envelope.partials';
+import { countdownSection, envelopeScene, familiesSection, musicPlayer, rsvpCtaSection, scheduleSection, storySection } from './envelope.partials';
 
 type PageData = Omit<WeddingData, 'guests'> & { builtAt?: string };
 
@@ -35,12 +34,10 @@ export function renderIndexPage(data: PageData): string {
 <main>
 ${envelopeScene(config, photos, { kind: 'announce', hasMusic: !!data.playlist?.length })}
 <div class="page-paper">
-${sceneLead(config, `<a class="btn" href="${PAGE_DIRS.rsvp}" data-cta="rsvp">Đăng ký tham dự</a>
-        <a class="btn btn--ghost btn--ink" href="#schedule">Xem lịch trình</a>`)}
 ${scheduleSection(config, photos)}
 ${familiesSection(config)}
 ${storySection(config, photos, galleryHtml)}
-${countdownSection(config, photos)}
+${countdownSection(config)}
 ${rsvpCtaSection(config, 'data-cta="rsvp-bottom"')}
 </div>
 </main>

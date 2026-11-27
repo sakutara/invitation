@@ -31,6 +31,7 @@ export function aspectFor(placement: PhotoPlacement, srcW: number, srcH: number)
       return 16 / 9;
     case 'invite_portrait':
     case 'story':
+    case 'calendar':
       return 4 / 5;
     case 'gallery':
     default:

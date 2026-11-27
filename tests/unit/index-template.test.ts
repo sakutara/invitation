@@ -48,6 +48,19 @@ describe('index.html (Announcement page)', () => {
     expect(render().querySelector('#schedule .event__map')).toBeNull();
   });
 
+  it('shows the party (reception) on the wording card, not the ceremony', () => {
+    const sheet = render().querySelector('.env-sheet--letter')!.textContent!.replace(/\s+/g, ' ');
+    for (const s of [DEFAULT_CONFIG.reception.venueName, '18:00', 'Tiệc cưới được tổ chức tại']) expect(sheet, s).toContain(s);
+    expect(sheet).not.toContain(DEFAULT_CONFIG.ceremony.venueName);
+  });
+
+  it('has no venue stamp and no map/route links on the schedule', () => {
+    const doc = render();
+    expect(doc.querySelector('.venue-stamp')).toBeNull();
+    expect(doc.querySelector('#schedule .sched-item__link')).toBeNull();
+    expect(doc.querySelector('#schedule .event__map')).toBeNull();
+  });
+
   it('labels the envelope card "Báo Hỉ" without the invitation line', () => {
     const doc = render();
     expect(doc.querySelector('.letter-card__title')!.textContent).toBe('Báo Hỉ');
@@ -58,7 +71,7 @@ describe('index.html (Announcement page)', () => {
   it('lays the page out as envelope, schedule + calendar, families, story + gallery, countdown, reply', () => {
     const doc = render([photo('h', 'hero'), photo('s', 'story')]);
     expect([...doc.querySelectorAll('main > section')].map((s) => s.id)).toEqual(['envelope']);
-    expect([...doc.querySelectorAll('main > .page-paper > section')].map((s) => s.id)).toEqual(['hero', 'schedule', 'family', 'story', 'countdown', 'rsvp-cta']);
+    expect([...doc.querySelectorAll('main > .page-paper > section')].map((s) => s.id)).toEqual(['schedule', 'family', 'story', 'countdown', 'rsvp-cta']);
     expect(doc.querySelector('#story #gallery')).not.toBeNull();
     expect(doc.querySelector('#rsvp-cta #closing')).not.toBeNull();
     const speeds = [...doc.querySelectorAll('[data-parallax-speed]')].map((e) => e.getAttribute('data-parallax-speed'));
@@ -66,12 +79,12 @@ describe('index.html (Announcement page)', () => {
     expect(doc.querySelector('#story [data-parallax-speed="0.25"] img')!.getAttribute('src')).toBe('assets/images/s/s-md.jpg');
   });
 
-  it('opens two sheets — the photo and the announcement — with the date and a heart seal on the envelope front', () => {
+  it('opens two sheets — the photo and the announcement — with a heart seal on the envelope front', () => {
     const doc = render([photo('h', 'hero')]);
     expect(doc.querySelectorAll('#envelope .env-sheet')).toHaveLength(2);
     expect(doc.querySelector('#envelope .env-sheet--photo img')!.getAttribute('src')).toBe('assets/images/h/h-md.jpg');
     expect(doc.querySelector('#envelope .env-sheet--letter')!.textContent).toContain(DEFAULT_CONFIG.headline);
-    expect(doc.querySelector('.envelope__date')!.textContent!.replace(/\s+/g, '')).toBe('16·01·2027');
+    expect(doc.querySelector('.envelope__date')).toBeNull();
     expect(doc.querySelector('.envelope__front .heart-seal .heart-seal__mono')!.textContent).toBe('Q&H');
     expect(doc.querySelector('#envelope .vinyl')).not.toBeNull();
   });
@@ -86,13 +99,15 @@ describe('index.html (Announcement page)', () => {
     expect(render().getElementById('music-data')).toBeNull();
     const doc = new JSDOM(renderIndexPage({ config: DEFAULT_CONFIG, photos: [], seatingZones: SEATING_ZONES, playlist: [{ id: 't1', title: 'Song', src: 'assets/music/t1.mp3', sortOrder: 0 }] })).window.document;
     expect(JSON.parse(doc.getElementById('music-data')!.textContent!)).toEqual([{ title: 'Song', src: 'assets/music/t1.mp3' }]);
-    expect(doc.querySelectorAll('[data-role="music-toggle"]')).toHaveLength(2); // the record in the envelope + the floating button
+    expect(doc.querySelectorAll('[data-role="music-toggle"]')).toHaveLength(1); // the record in the envelope is the only on/off button
+    expect(doc.querySelector('#envelope button.vinyl[data-role="music-toggle"]')).not.toBeNull();
+    expect(doc.querySelector('.music-fab')).toBeNull();
   });
 
-  it('links the primary Burgundy CTA to rsvp.html', () => {
+  it('has a single RSVP button, at the bottom of the page', () => {
     const ctas = [...render().querySelectorAll('a.btn[href="dang-ky/"]')];
-    expect(ctas.length).toBeGreaterThanOrEqual(2);
-    expect(ctas[0].getAttribute('data-cta')).toBe('rsvp');
+    expect(ctas).toHaveLength(1);
+    expect(ctas[0].getAttribute('data-cta')).toBe('rsvp-bottom');
   });
 
   it('renders a responsive gallery that adapts to any number of photos', () => {

@@ -1,5 +1,4 @@
 /** Shared HTML partials for the three static pages. */
-import { blossomPaths, bouquetPaths, floralPaths } from '../../shared/florals';
 import { FONTS_HREF } from '../../shared/web-fonts';
 import { escapeHtml } from '../../shared/html';
 import { formatViDateTime } from '../../shared/date-format';
@@ -79,25 +78,24 @@ export function firstPhoto(photos: PhotoRecord[], ...placements: PhotoRecord['pl
   return null;
 }
 
-/** Botanical corner ornament (foreground parallax layer). */
-/** Watercolour-style floral spray (shared with the JPG card, see shared/florals.ts). */
-const FLIP = { none: '', h: 'matrix(-1 0 0 1 220 0)', v: 'matrix(1 0 0 -1 0 220)', both: 'matrix(-1 0 0 -1 220 220)' };
+export type FloralFlip = 'none' | 'h' | 'v' | 'both';
 
-/** `flip` mirrors the spray inside its box (h: grows from the bottom-right, v: from the top-left, both: top-right). */
-export function floralSpray(cls = '', attrs = '', flip: keyof typeof FLIP = 'none'): string {
-  const inner = FLIP[flip] ? `<g transform="${FLIP[flip]}">${floralPaths()}</g>` : floralPaths();
-  return `<svg class="floral ${cls}"${attrs} viewBox="0 0 220 220" fill="none" aria-hidden="true">${inner}</svg>`;
+/**
+ * Decorative forget-me-not motif (one watercolour raster, src/frontend/images, styled by .floral in main.css).
+ * `flip` mirrors the image: h = horizontal, v = vertical, both = half turn.
+ */
+export function floralSpray(cls = '', attrs = '', flip: FloralFlip = 'none'): string {
+  return `<span class="floral ${cls}"${attrs} aria-hidden="true"><span class="floral__img floral__img--${flip}"></span></span>`;
 }
 
-/** Hand-tied bouquet (blush roses, yellow blooms, bow). */
+/** Bouquet slot: the same motif, unflipped. */
 export function bouquet(cls = '', attrs = ''): string {
-  return `<svg class="floral floral--bouquet ${cls}"${attrs} viewBox="0 0 200 280" fill="none" aria-hidden="true">${bouquetPaths()}</svg>`;
+  return floralSpray(cls, attrs, 'none');
 }
 
-/** Single inked flower (dusty blue by default, or wine/blush). */
-export function blossom(cls = '', tone: 'blue' | 'wine' | 'lavender' = 'blue', attrs = ''): string {
-  const [ink, wash] = { blue: ['#5A7BA6', '#C9D6EA'], wine: ['#8E2F45', '#F3C9D3'], lavender: ['#7067A8', '#D7D2F0'] }[tone];
-  return `<svg class="floral floral--blossom ${cls}"${attrs} viewBox="0 0 120 120" fill="none" aria-hidden="true">${blossomPaths(ink, wash)}</svg>`;
+/** Single flower slot: the same motif mirrored horizontally (`tone` is no longer used). */
+export function blossom(cls = '', _tone: 'blue' | 'wine' | 'lavender' = 'blue', attrs = ''): string {
+  return floralSpray(cls, attrs, 'h');
 }
 
 /** Corner florals; kept under the parallax ornament contract (data-parallax-speed="-0.15"). */

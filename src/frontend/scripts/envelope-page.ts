@@ -33,7 +33,7 @@ export function initCountdown(doc: Document = document, now: () => number = Date
 /** Tapping the wax seal scrolls the envelope scene to its opened state (both sheets out, ready to read). */
 export function initEnvelope(doc: Document = document): void {
   const scene = doc.querySelector<HTMLElement>('[data-scroll-scene]');
-  doc.querySelector('[data-role="open-envelope"]')?.addEventListener('click', () => scene && scrollSceneTo(scene, 0.93, doc.defaultView ?? window));
+  doc.querySelector('[data-role="open-envelope"]')?.addEventListener('click', () => scene && scrollSceneTo(scene, 0.8,doc.defaultView ?? window));
 }
 
 export function initEnvelopePage(doc: Document = document): void {

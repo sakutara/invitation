@@ -100,7 +100,8 @@ const INVITATION_FIELDS = [
   ['rsvpNote', 'Ghi chú xác nhận', 'Vd. Vui lòng phản hồi trước ngày 01/01/2027'],
   ['closingTitle', 'Lời kết'],
   ['closingNote', 'Ghi chú cuối thiệp'],
-  ['contact', 'Liên hệ', 'Không bắt buộc · số điện thoại hoặc email'],
+  ['groomPhone', 'SĐT chú rể'],
+  ['bridePhone', 'SĐT cô dâu'],
 ];
 
 function invitationSection() {

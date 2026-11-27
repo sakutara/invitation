@@ -13,7 +13,7 @@
       "address": "Thuận Hóa, Tp. Huế"
     },
     "headline": "Trân trọng báo tin lễ thành hôn",
-    "story": "Từ những ngày đầu gặp gỡ đến hôm nay, chúng mình đã cùng nhau đi qua thật nhiều kỷ niệm. Và giờ đây, chúng mình muốn được cùng gia đình và bạn bè chia sẻ khoảnh khắc trọng đại nhất.",
+    "story": "Từ hai người xa lạ thành tri kỷ, từ những ngày đồng hành thành một gia đình nhỏ. Cảm ơn thời gian đã đưa chúng mình đến bên nhau, và cảm ơn vì đã luôn là bến đỗ bình yên của nhau giữa thế giới rộng lớn này. Hành trình mới bắt đầu từ hôm nay.",
     "ceremony": {
       "title": "Lễ Thành Hôn",
       "datetime": "2027-01-17T09:30:00+07:00",
@@ -25,7 +25,7 @@
     },
     "reception": {
       "title": "Tiệc Cưới",
-      "datetime": "2027-01-17T16:30:00+07:00",
+      "datetime": "2027-01-17T17:00:00+07:00",
       "venueName": "Trung Tâm Hội Nghị & Tiệc Cưới White Lotus Huế",
       "address": "05 – 07 Hoàng Hoa Thám, Thuận Hóa, Tp. Huế",
       "mapsUrl": "https://maps.app.goo.gl/iD8FtUMxDyFZb7Yd9",
@@ -64,21 +64,88 @@
       "rsvpNote": "Mong bạn xác nhận tham dự để chúng mình chuẩn bị chu đáo nhất.",
       "closingTitle": "Thân thương",
       "closingNote": "Mọi thắc mắc xin liên hệ cô dâu & chú rể",
-      "contact": "0988765444"
+      "groomPhone": "0988765444",
+      "bridePhone": "0948765444"
     }
   },
   "photos": [
     {
-      "id": "photo-2be5b4da",
+      "id": "photo-5973eda2",
+      "caption": "",
+      "placement": "calendar",
+      "sortOrder": 0,
+      "focalPoint": null,
+      "crop": null,
+      "variants": [
+        {
+          "tier": "sm",
+          "format": "webp",
+          "width": 640,
+          "height": 800,
+          "src": "assets/images/photo-5973eda2/photo-5973eda2-sm.webp"
+        },
+        {
+          "tier": "sm",
+          "format": "jpg",
+          "width": 640,
+          "height": 800,
+          "src": "assets/images/photo-5973eda2/photo-5973eda2-sm.jpg"
+        },
+        {
+          "tier": "md",
+          "format": "webp",
+          "width": 1024,
+          "height": 1280,
+          "src": "assets/images/photo-5973eda2/photo-5973eda2-md.webp"
+        },
+        {
+          "tier": "md",
+          "format": "jpg",
+          "width": 1024,
+          "height": 1280,
+          "src": "assets/images/photo-5973eda2/photo-5973eda2-md.jpg"
+        },
+        {
+          "tier": "lg",
+          "format": "webp",
+          "width": 1440,
+          "height": 1800,
+          "src": "assets/images/photo-5973eda2/photo-5973eda2-lg.webp"
+        },
+        {
+          "tier": "lg",
+          "format": "jpg",
+          "width": 1440,
+          "height": 1800,
+          "src": "assets/images/photo-5973eda2/photo-5973eda2-lg.jpg"
+        },
+        {
+          "tier": "fhd",
+          "format": "webp",
+          "width": 1920,
+          "height": 2400,
+          "src": "assets/images/photo-5973eda2/photo-5973eda2-fhd.webp"
+        },
+        {
+          "tier": "fhd",
+          "format": "jpg",
+          "width": 1920,
+          "height": 2400,
+          "src": "assets/images/photo-5973eda2/photo-5973eda2-fhd.jpg"
+        }
+      ]
+    },
+    {
+      "id": "photo-4044d3ca",
       "caption": "",
       "placement": "story",
       "sortOrder": 1,
       "focalPoint": null,
       "crop": {
-        "x": 0,
+        "x": 0.088294,
         "y": 0,
-        "w": 1,
-        "h": 0.83301
+        "w": 0.5332,
+        "h": 1
       },
       "variants": [
         {
@@ -86,132 +153,136 @@
           "format": "webp",
           "width": 640,
           "height": 800,
-          "src": "assets/images/photo-2be5b4da/photo-2be5b4da-sm.webp"
+          "src": "assets/images/photo-4044d3ca/photo-4044d3ca-sm.webp"
         },
         {
           "tier": "sm",
           "format": "jpg",
           "width": 640,
           "height": 800,
-          "src": "assets/images/photo-2be5b4da/photo-2be5b4da-sm.jpg"
+          "src": "assets/images/photo-4044d3ca/photo-4044d3ca-sm.jpg"
         },
         {
           "tier": "md",
           "format": "webp",
-          "width": 859,
-          "height": 1074,
-          "src": "assets/images/photo-2be5b4da/photo-2be5b4da-md.webp"
+          "width": 1024,
+          "height": 1280,
+          "src": "assets/images/photo-4044d3ca/photo-4044d3ca-md.webp"
         },
         {
           "tier": "md",
           "format": "jpg",
-          "width": 859,
-          "height": 1074,
-          "src": "assets/images/photo-2be5b4da/photo-2be5b4da-md.jpg"
+          "width": 1024,
+          "height": 1280,
+          "src": "assets/images/photo-4044d3ca/photo-4044d3ca-md.jpg"
         },
         {
           "tier": "lg",
           "format": "webp",
-          "width": 859,
-          "height": 1074,
-          "src": "assets/images/photo-2be5b4da/photo-2be5b4da-lg.webp"
+          "width": 1440,
+          "height": 1800,
+          "src": "assets/images/photo-4044d3ca/photo-4044d3ca-lg.webp"
         },
         {
           "tier": "lg",
           "format": "jpg",
-          "width": 859,
-          "height": 1074,
-          "src": "assets/images/photo-2be5b4da/photo-2be5b4da-lg.jpg"
+          "width": 1440,
+          "height": 1800,
+          "src": "assets/images/photo-4044d3ca/photo-4044d3ca-lg.jpg"
         },
         {
           "tier": "fhd",
           "format": "webp",
-          "width": 859,
-          "height": 1074,
-          "src": "assets/images/photo-2be5b4da/photo-2be5b4da-fhd.webp"
+          "width": 1920,
+          "height": 2400,
+          "src": "assets/images/photo-4044d3ca/photo-4044d3ca-fhd.webp"
         },
         {
           "tier": "fhd",
           "format": "jpg",
-          "width": 859,
-          "height": 1074,
-          "src": "assets/images/photo-2be5b4da/photo-2be5b4da-fhd.jpg"
+          "width": 1920,
+          "height": 2400,
+          "src": "assets/images/photo-4044d3ca/photo-4044d3ca-fhd.jpg"
         }
       ]
     },
     {
-      "id": "photo-602f8e54",
+      "id": "photo-38b641e3",
       "caption": "",
-      "placement": "hero",
+      "placement": "invite_portrait",
       "sortOrder": 2,
       "focalPoint": null,
-      "crop": {
-        "x": 0.147813,
-        "y": 0.580252,
-        "w": 0.826446,
-        "h": 0.309797
-      },
+      "crop": null,
       "variants": [
         {
           "tier": "sm",
           "format": "webp",
           "width": 640,
-          "height": 360,
-          "src": "assets/images/photo-602f8e54/photo-602f8e54-sm.webp"
+          "height": 800,
+          "src": "assets/images/photo-38b641e3/photo-38b641e3-sm.webp"
         },
         {
           "tier": "sm",
           "format": "jpg",
           "width": 640,
-          "height": 360,
-          "src": "assets/images/photo-602f8e54/photo-602f8e54-sm.jpg"
+          "height": 800,
+          "src": "assets/images/photo-38b641e3/photo-38b641e3-sm.jpg"
         },
         {
           "tier": "md",
           "format": "webp",
-          "width": 710,
-          "height": 399,
-          "src": "assets/images/photo-602f8e54/photo-602f8e54-md.webp"
+          "width": 1024,
+          "height": 1280,
+          "src": "assets/images/photo-38b641e3/photo-38b641e3-md.webp"
         },
         {
           "tier": "md",
           "format": "jpg",
-          "width": 710,
-          "height": 399,
-          "src": "assets/images/photo-602f8e54/photo-602f8e54-md.jpg"
+          "width": 1024,
+          "height": 1280,
+          "src": "assets/images/photo-38b641e3/photo-38b641e3-md.jpg"
         },
         {
           "tier": "lg",
           "format": "webp",
-          "width": 710,
-          "height": 399,
-          "src": "assets/images/photo-602f8e54/photo-602f8e54-lg.webp"
+          "width": 1440,
+          "height": 1800,
+          "src": "assets/images/photo-38b641e3/photo-38b641e3-lg.webp"
         },
         {
           "tier": "lg",
           "format": "jpg",
-          "width": 710,
-          "height": 399,
-          "src": "assets/images/photo-602f8e54/photo-602f8e54-lg.jpg"
+          "width": 1440,
+          "height": 1800,
+          "src": "assets/images/photo-38b641e3/photo-38b641e3-lg.jpg"
         },
         {
           "tier": "fhd",
           "format": "webp",
-          "width": 710,
-          "height": 399,
-          "src": "assets/images/photo-602f8e54/photo-602f8e54-fhd.webp"
+          "width": 1920,
+          "height": 2400,
+          "src": "assets/images/photo-38b641e3/photo-38b641e3-fhd.webp"
         },
         {
           "tier": "fhd",
           "format": "jpg",
-          "width": 710,
-          "height": 399,
-          "src": "assets/images/photo-602f8e54/photo-602f8e54-fhd.jpg"
+          "width": 1920,
+          "height": 2400,
+          "src": "assets/images/photo-38b641e3/photo-38b641e3-fhd.jpg"
         }
       ]
     }
   ],
-  "playlist": [],
+  "playlist": [
+    {
+      "id": "track-bd4734d5",
+      "title": "If you Love Me for Me- Barbie as the Princess and the Pauper w/ Lyrics",
+      "src": "",
+      "youtubeId": "DBoaOnj6Ll4",
+      "youtubeUrl": "https://www.youtube.com/watch?v=DBoaOnj6Ll4",
+      "sortOrder": 0
+    }
+  ],
   "seatingZones": [
     {
       "id": "ZONE_A1",
@@ -562,5 +633,5 @@
       }
     ]
   },
-  "builtAt": "2026-11-27T14:49:21.398Z"
+  "builtAt": "2026-11-27T17:01:25.378Z"
 }

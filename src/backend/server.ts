@@ -47,7 +47,7 @@ export const status = (code: number, body?: unknown) => ({ [STATUS]: code, body 
 const STATUS = Symbol('status');
 
 const MAX_BODY = 80 * 1024 * 1024;
-const PLACEMENTS: PhotoPlacement[] = ['hero', 'story', 'gallery', 'rsvp_background', 'invite_portrait', 'static_map'];
+const PLACEMENTS: PhotoPlacement[] = ['hero', 'story', 'gallery', 'rsvp_background', 'invite_portrait', 'calendar', 'static_map'];
 const ZONE_IDS = SEATING_ZONES.map((z) => z.id);
 
 async function readBody(req: IncomingMessage): Promise<unknown> {

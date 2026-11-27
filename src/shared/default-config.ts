@@ -21,7 +21,8 @@ export const DEFAULT_INVITATION: InvitationContent = {
   rsvpNote: 'Mong bạn xác nhận tham dự để chúng mình chuẩn bị chu đáo nhất.',
   closingTitle: 'Thân thương',
   closingNote: 'Mọi thắc mắc xin liên hệ cô dâu & chú rể',
-  contact: '',
+  groomPhone: '',
+  bridePhone: '',
 };
 
 export const DEFAULT_CONFIG: WeddingConfig = {

@@ -85,8 +85,10 @@ describe('generateCards (bulk)', () => {
     expect(cardFileName({ rowId: 'R/3', shortId: 'abcdef', name: 'Đặng Thị Ánh' })).toBe('R-3_abcdef_dang-thi-anh.jpg');
   });
 
-  it('is vector only (no photos to fetch before saving)', () => {
-    expect(renderCardSvg(INPUT)).not.toContain('<image');
+  it('is self-contained (no photos to fetch before saving; the only <image> is the embedded floral data URI)', () => {
+    const svg = renderCardSvg(INPUT);
+    expect(svg).not.toMatch(/href="https?:/);
+    for (const m of svg.matchAll(/<image\b[^>]*\bhref="([^"]*)"/g)) expect(m[1]).toMatch(/^data:image\/png;base64,/);
   });
 
   it('omits table guidance (but keeps the map) when there is no guest', () => {

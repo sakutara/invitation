@@ -5,7 +5,7 @@ import { mapSeating, renderSeatingMapSvg } from '../../shared/seating-mapper';
 import { FALLBACK_GUEST, type WeddingData } from '../../shared/types';
 import { rebaseAssets, SUBPAGE_ROOT } from '../../shared/routes';
 import { blossom, documentShell, firstPhoto, ornament, variant } from './partials';
-import { closingSection, countdownSection, envelopeScene, musicPlayer, sceneLead, scheduleSection } from './envelope.partials';
+import { closingSection, countdownSection, envelopeScene, musicPlayer, scheduleSection } from './envelope.partials';
 
 type PageData = Omit<WeddingData, 'guests'> & { builtAt?: string };
 
@@ -25,9 +25,7 @@ export function renderInvitePage(input: PageData): string {
 <main>
 ${envelopeScene(config, photos, { hasMusic: !!data.playlist?.length })}
 <div class="page-paper">
-${sceneLead(config, `<a class="btn" href="#card">Lưu thiệp JPG</a>
-        <a class="btn btn--navy" href="#seating">Xem chỗ ngồi</a>`)}
-${scheduleSection(config, photos, { root: SUBPAGE_ROOT, withMaps: true, id: 'events' })}
+${scheduleSection(config, photos, { withMaps: true, id: 'events' })}
   <section id="seating" class="section seating-section" data-scroll-progress data-scroll-span="1">
     ${ornament('br')}
     <div class="container" data-parallax-speed="0">
@@ -43,7 +41,7 @@ ${scheduleSection(config, photos, { root: SUBPAGE_ROOT, withMaps: true, id: 'eve
       </div>
     </div>
   </section>
-${countdownSection(config, photos)}
+${countdownSection(config)}
   <section id="card" class="section card-section" data-scroll-progress data-scroll-span="1">
     ${blossom('card-section__blossom', 'wine')}
     <div class="container save-card">

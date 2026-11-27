@@ -47,14 +47,16 @@ describe('scroll scene math', () => {
     expect(sceneProgress(-5000, 3800, 1000)).toBe(1);
     expect(sceneProgress(200, 3800, 1000)).toBe(0);
   });
-  it('runs the phases in order: cover lifts, flap opens, sheets rise, fan out, come forward', () => {
+  it('runs the phases in order: cover lifts, flap opens, sheets rise, fan out, come forward, then hold', () => {
     const at = (p: number) => phaseValues(p);
     expect(at(0)).toMatchObject({ cover: 0, flap: 0, rise: 0, fan: 0, read: 0 });
-    expect(at(0.2)).toMatchObject({ cover: 1, rise: 0 });
-    expect(at(0.2).flap).toBeGreaterThan(0);
-    expect(at(0.4)).toMatchObject({ flap: 1, fan: 0 });
-    expect(at(0.4).rise).toBeGreaterThan(0.5);
-    expect(at(0.7)).toMatchObject({ rise: 1, fan: 1 });
+    expect(at(0.3)).toMatchObject({ flap: 1, fan: 0 });
+    expect(at(0.3).rise).toBeGreaterThan(0);
+    expect(at(0.3).rise).toBeLessThan(1);
+    expect(at(0.6)).toMatchObject({ rise: 1, fan: 1 });
+    expect(at(0.6).read).toBeGreaterThan(0);
+    expect(at(0.6).read).toBeLessThan(1);
+    expect(at(0.8)).toEqual(Object.fromEntries(Object.keys(ENVELOPE_PHASES).map((k) => [k, 1])));
     expect(at(1)).toEqual(Object.fromEntries(Object.keys(ENVELOPE_PHASES).map((k) => [k, 1])));
   });
   it('entry progress grows as the element rises into view', () => {
@@ -82,20 +84,34 @@ describe('invitation content', () => {
   });
   it('renders the envelope scene, heart calendar and countdown from the config', () => {
     const html = renderInvitePage({
-      config: { ...DEFAULT_CONFIG, invitation: { coverEyebrow: 'Thư tay của', contact: '0905 123 456' } },
+      config: { ...DEFAULT_CONFIG, invitation: { coverEyebrow: 'Thư tay của' } },
       photos: [],
       seatingZones: SEATING_ZONES,
     });
     document.documentElement.innerHTML = html.replace(/^[\s\S]*?<html[^>]*>/, '').replace(/<\/html>\s*$/, '');
     expect(document.querySelector('[data-scroll-scene] .envelope__flap')).not.toBeNull();
     expect(document.querySelector('.envelope-cover__eyebrow')!.textContent).toBe('Thư tay của');
-    expect(document.querySelectorAll('.wax-seal__mono')[0].textContent).toBe('Q&H');
+    expect(document.querySelector('.envelope-cover__seal .heart-seal__mono')!.textContent).toBe('Q&H');
     const day = document.querySelector('.calendar__cell--day')!;
     expect(day.textContent).toBe('16');
     expect(day.querySelector('.calendar__heart path')).not.toBeNull();
     expect(document.querySelector<HTMLElement>('[data-role="countdown"]')!.dataset.target).toBe(DEFAULT_CONFIG.ceremony.datetime);
-    expect(document.querySelector('a[data-role="add-calendar"]')!.getAttribute('href')).toBe('../assets/data/wedding.ics');
-    expect(document.querySelector('.closing-card__contact')!.textContent).toBe('0905 123 456');
+    expect(document.querySelector('a[data-role="add-calendar"]')).toBeNull();
+    expect(document.querySelectorAll('.calendar__actions a')).toHaveLength(1);
+    expect(document.querySelector('.calendar__actions a')!.getAttribute('href')).toContain('google.com');
+  });
+  it('lists the groom and bride phones on the closing card as tel links', () => {
+    const html = renderInvitePage({
+      config: { ...DEFAULT_CONFIG, invitation: { groomPhone: '0901 111 222', bridePhone: '0903 333 444' } },
+      photos: [],
+      seatingZones: SEATING_ZONES,
+    });
+    document.documentElement.innerHTML = html.replace(/^[\s\S]*?<html[^>]*>/, '').replace(/<\/html>\s*$/, '');
+    const text = document.querySelector('.closing-card__phones')!.textContent!;
+    expect(text).toContain('0901 111 222');
+    expect(text).toContain('0903 333 444');
+    expect(document.querySelector('a[href="tel:0901111222"]')!.textContent).toBe('0901 111 222');
+    expect(document.querySelector('a[href="tel:0903333444"]')).not.toBeNull();
   });
 });
 
@@ -124,8 +140,8 @@ describe('scroll scene', () => {
     const at = (p: number) => phaseValues(p);
     expect(at(0).cover).toBe(0);
     expect(at(1)).toEqual({ cover: 1, stage: 1, flap: 1, rise: 1, fan: 1, read: 1 });
-    // somewhere between 0 and 0.9 at least one phase is always in motion
-    for (let p = 0.005; p < 0.9; p += 0.01) {
+    // somewhere between 0 and 0.72 at least one phase is always in motion
+    for (let p = 0.005; p < 0.72; p += 0.01) {
       const v = Object.values(at(p));
       expect(v.some((x) => x > 0 && x < 1), String(p)).toBe(true);
     }

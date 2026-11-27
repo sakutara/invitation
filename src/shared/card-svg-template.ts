@@ -4,7 +4,7 @@
  */
 import QRCode from 'qrcode';
 import { guestNameLine, presenceLine } from './invitation-formatter';
-import { floralPaths } from './florals';
+import { FLORAL_ASPECT, FLORAL_PNG_DATA_URI } from './floral-image';
 import { lunarLine } from './lunar-calendar';
 import { resolveInvitation } from './default-config';
 import { mapSeating, escapeXml } from './seating-mapper';
@@ -142,8 +142,10 @@ export function renderCardSvg(input: CardInput): string {
   out.push(family(320, 'Nhà Trai:', config.groomParents), family(760, 'Nhà Gái:', config.brideParents));
   const cardBottom = Math.max(1380, y + 2 * 38 + 34);
 
-  // Floral spray box is 220x220 growing from its bottom-left corner; negative scales mirror it.
-  const floral = (tx: number, ty: number, sx: number, sy: number) => `<g fill="none" transform="translate(${tx} ${ty}) scale(${sx} ${sy})">${floralPaths()}</g>`;
+  // Forget-me-not motif: a 250px-wide image; the top-right one is mirrored horizontally.
+  const FLORAL_W_PX = 250;
+  const FLORAL_H_PX = Math.round(FLORAL_W_PX / FLORAL_ASPECT);
+  const floralImage = `<image x="0" y="0" width="${FLORAL_W_PX}" height="${FLORAL_H_PX}" href="${FLORAL_PNG_DATA_URI}" xlink:href="${FLORAL_PNG_DATA_URI}" preserveAspectRatio="xMidYMid meet"/>`;
   const seatText = seating ? `Chỗ ngồi: ${seating.zone.nameVi.split(' - ')[0]} · ${seating.seatCount} chỗ` : '';
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`,
@@ -151,9 +153,9 @@ export function renderCardSvg(input: CardInput): string {
     `<rect width="${W}" height="${H}" fill="url(#card-folder)"/>`,
     `<rect x="60" y="50" width="${W - 120}" height="${cardBottom - 50}" rx="34" fill="${C.paper}"/>`,
     `<rect x="82" y="72" width="${W - 164}" height="${cardBottom - 94}" rx="20" fill="none" stroke="${C.rule}" stroke-width="2.5"/>`,
-    floral(1100, -20 + 220 * 1.45, -1.45, -1.45), // top-right corner
+    `<g transform="translate(${W - 60 - FLORAL_W_PX + 30 + FLORAL_W_PX} 30) scale(-1 1)">${floralImage}</g>`, // top-right corner, mirrored
     ...out,
-    floral(-40, 1640 - 220 * 1.3, 1.3, 1.3), // bottom-left corner
+    `<g transform="translate(20 ${cardBottom - FLORAL_H_PX + 40})">${floralImage}</g>`, // bottom-left corner
     seating
       ? `<text x="600" y="${cardBottom + 78}" text-anchor="end" font-family="${SANS}" font-size="27" font-weight="700" fill="${C.paper}">${escapeXml(seatText)}</text>` +
         `<text x="600" y="${cardBottom + 116}" text-anchor="end" font-family="${SANS}" font-size="21" fill="${C.paper}" fill-opacity=".85">${escapeXml(seating.zone.tableRange)}</text>`

@@ -1,18 +1,16 @@
 /**
  * Background music from the CMS playlist (#music-data): plays the tracks in order and loops the list.
  * A track is either an uploaded audio file (`src`) or a YouTube video (`youtubeId`, played through YouTube's
- * embedded player, hidden on the page). Starts as soon as the page opens; when the browser blocks sound before
- * any interaction, it starts on the first tap / click / key press instead. Every [data-role="music-toggle"]
- * (the record in the envelope, the floating button) pauses / resumes; a pause chosen by the guest is remembered
- * for the visit. <html> gets .is-music-playing while sound plays (the records spin, the waves pulse).
+ * embedded player, hidden on the page). Starts by itself on every visit; when the browser blocks sound before
+ * any interaction, every tap / click / key press retries until it is playing. The record in the envelope
+ * ([data-role="music-toggle"]) pauses / resumes. <html> gets .is-music-playing while sound plays (the record
+ * spins and the sound waves appear).
  */
 export interface Track {
   title: string;
   src: string;
   youtubeId?: string;
 }
-
-const MUTED_KEY = 'wedding-music-muted';
 
 export function nextIndex(i: number, length: number): number {
   return length ? (i + 1) % length : 0;
@@ -177,15 +175,9 @@ export function initMusic(doc: Document = document): { toggle: () => void } | nu
   if (!tracks.length) return null;
 
   const win = doc.defaultView ?? window;
-  const store = (() => {
-    try {
-      return win.sessionStorage;
-    } catch {
-      return null;
-    }
-  })();
   let index = 0;
-  let wanted = store?.getItem(MUTED_KEY) !== '1';
+  /** false only after the guest switched the music off with the record. */
+  let wanted = true;
   let failures = 0;
   const toggles = Array.from(doc.querySelectorAll<HTMLElement>('[data-role="music-toggle"]'));
 
@@ -202,6 +194,7 @@ export function initMusic(doc: Document = document): { toggle: () => void } | nu
   const cb: Callbacks = {
     onPlay: () => {
       failures = 0;
+      unlock.cleanup();
       render();
     },
     onPause: render,
@@ -231,31 +224,24 @@ export function initMusic(doc: Document = document): { toggle: () => void } | nu
   const play = () => current.play();
 
   const toggle = () => {
-    if (!current.playing) {
-      wanted = true;
-      store?.removeItem(MUTED_KEY);
-      play();
-    } else {
-      wanted = false;
-      store?.setItem(MUTED_KEY, '1');
-      current.pause();
-    }
+    wanted = !current.playing;
+    if (wanted) play();
+    else current.pause();
   };
   for (const t of toggles) {
     t.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      unlock.cleanup();
       toggle();
     });
   }
 
-  // Autoplay with sound needs a user gesture in most browsers: retry on the first one.
+  // Autoplay with sound needs a user gesture in most browsers. Keep retrying on each one until sound really plays
+  // (a touch's pointerdown, or a tap before the YouTube player is ready, is not enough on its own).
   const unlock = (() => {
-    const events = ['pointerdown', 'touchend', 'keydown', 'click'];
+    const events = ['pointerdown', 'pointerup', 'mousedown', 'touchend', 'keydown', 'click'];
     const handler = (e: Event) => {
       if (toggles.some((t) => t.contains(e.target as Node))) return;
-      cleanup();
       if (wanted && !current.playing) play();
     };
     const cleanup = () => events.forEach((n) => doc.removeEventListener(n, handler, true));

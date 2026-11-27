@@ -4,6 +4,7 @@ import { api, h, openModal } from './common.js';
 const PLACEMENTS = [
   ['hero', 'Ảnh bìa trang chủ'],
   ['story', 'Nền mục "Câu chuyện"'],
+  ['calendar', 'Ảnh kèm lịch cưới'],
   ['gallery', 'Album ảnh'],
   ['rsvp_background', 'Nền trang đăng ký'],
   ['invite_portrait', 'Ảnh chân dung trên thiệp'],
@@ -11,7 +12,7 @@ const PLACEMENTS = [
 ];
 const PLACEMENT_LABEL = Object.fromEntries(PLACEMENTS);
 /** Fixed frame ratios (width / height). Gallery is handled separately (3:2 or 2:3). */
-const FIXED_ASPECT = { hero: 16 / 9, rsvp_background: 16 / 9, story: 4 / 5, invite_portrait: 4 / 5 };
+const FIXED_ASPECT = { hero: 16 / 9, rsvp_background: 16 / 9, story: 4 / 5, invite_portrait: 4 / 5, calendar: 4 / 5 };
 const MAX_ZOOM = 5;
 /** Double-tap: max gap between taps (ms) and max distance (px). A tap is a press that moved less than TAP_MOVE_PX. */
 const TAP_MS = 300;

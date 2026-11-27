@@ -402,12 +402,11 @@ export function closingSection(config: WeddingConfig): string {
   </section>`;
 }
 
-/** Background music: the playlist for scripts/music.ts and a floating record button. */
+/** Background music: the playlist for scripts/music.ts (the record in the envelope is its on/off button). */
 export function musicPlayer(playlist: MusicTrack[] | undefined, root = ''): string {
   const tracks = (playlist ?? []).map((t) =>
     t.youtubeId ? { title: t.title, src: '', youtubeId: t.youtubeId } : { title: t.title, src: root + t.src },
   );
   if (!tracks.length) return '';
-  return `<script type="application/json" id="music-data">${JSON.stringify(tracks).replace(/</g, '\\u003c')}</script>
-<button class="music-fab" type="button" data-role="music-toggle" aria-label="Bật / tắt nhạc" aria-pressed="false"><span class="music-fab__disc" aria-hidden="true"></span><span class="music-fab__note" aria-hidden="true">♪</span></button>`;
+  return `<script type="application/json" id="music-data">${JSON.stringify(tracks).replace(/</g, '\\u003c')}</script>`;
 }
