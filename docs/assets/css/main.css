@@ -351,6 +351,15 @@ html:has(.page-rsvp), body.page-rsvp { height: 100%; overflow: hidden; }
   opacity: calc(0.15 + var(--stage) * 0.85);
   transform: translate3d(0, calc((var(--card) - var(--fan)) * 13svh), 0) scale(calc(0.88 + var(--stage) * 0.12));
 }
+/* Desktop: a much larger envelope and card. The standing card overhangs the envelope more at the top than at the
+   bottom, so the stage settles slightly lower and the caption sits closer. */
+@media (min-width: 761px) {
+  .envelope-stage {
+    --env-w: min(62vw, 640px, 64svh);
+    transform: translate3d(0, calc((var(--card) - var(--fan)) * 18svh + var(--fan) * var(--env-w) * 0.13), 0) scale(calc(0.88 + var(--stage) * 0.12));
+  }
+  .envelope-stage .envelope-caption { margin-top: calc(var(--fan) * var(--env-w) * 0.19 + 18px); }
+}
 .envelope { position: relative; width: var(--env-w); aspect-ratio: 10 / 7; perspective: 1400px; container-type: inline-size; }
 .envelope__back {
   position: absolute; inset: 0; border-radius: 4px;
@@ -383,14 +392,14 @@ html:has(.page-rsvp), body.page-rsvp { height: 100%; overflow: hidden; }
 .envelope-scene.is-out .letter-card { z-index: 6; }
 .letter-card__paper {
   position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; overflow: hidden;
-  padding: 10cqw 8cqw 7cqw; border-radius: 3cqw; background: var(--color-paper);
+  padding: 7cqw 7cqw 7cqw; border-radius: 3cqw; background: var(--color-paper);
 }
 .letter-card__paper::before { content: ''; position: absolute; inset: 2.4cqw; border: 0.5cqw solid var(--color-rule); border-radius: 2.4cqw; pointer-events: none; }
 .letter-card__floral { position: absolute; z-index: 0; width: 50%; pointer-events: none; }
 .letter-card__floral--l { left: -4%; top: 34%; }
 .letter-card__floral--r { right: -4%; top: 10%; }
 .letter-card__arch {
-  position: relative; z-index: 1; width: 58%; aspect-ratio: 0.74; margin: 0; display: flex; flex-direction: column; align-items: center; overflow: hidden;
+  position: relative; z-index: 1; flex: 1; min-height: 0; width: 92%; margin: 0 0 4cqw; display: flex; flex-direction: column; align-items: center; overflow: hidden;
   border-radius: 50% 50% 0 0 / 34% 34% 0 0; border: 0.6cqw solid #D8DCE2; background: var(--color-paper);
 }
 .letter-card__title { flex: none; padding-top: 7cqw; font-size: 11cqw; line-height: 1.1; color: var(--color-wine); }
