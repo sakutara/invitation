@@ -422,7 +422,7 @@ html:has(.page-rsvp), body.page-rsvp { height: 100%; overflow: hidden; }
 /* wording sheet */
 .env-sheet--letter .env-sheet__paper { justify-content: space-evenly; gap: 0.6cqi; padding: 7cqi 7cqi 6cqi; text-align: center; color: var(--color-ink); }
 .env-sheet--letter .invite-card__badge { position: absolute; top: 3.4cqi; right: 4cqi; z-index: 3; font-size: 2.6cqi; padding: 0.4em 1em; }
-.env-sheet .paper-card__floral { position: absolute !important; z-index: 0 !important; width: calc(52cqi * 0.5); left: -3cqi; bottom: -3cqi; opacity: 0.85; pointer-events: none; }
+.env-sheet .paper-card__floral { position: absolute !important; z-index: 0 !important; width: 19cqi; left: -3cqi; bottom: -3cqi; opacity: 0.85; pointer-events: none; }
 .env-sheet .pc-caps { font: 600 3.1cqi/1.4 var(--font-body); letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-ink); white-space: pre-line; }
 .env-sheet .pc-caps--sm { font-weight: 500; font-size: 2.85cqi; }
 .env-sheet .pc-guest { min-width: 70%; min-height: 1.4em; padding: 0 1em 0.1em; border-bottom: 0.4cqi dotted rgba(42, 45, 51, 0.65); font: italic 500 5cqi/1.3 var(--font-display); color: var(--color-wine); }
@@ -731,6 +731,11 @@ button.vinyl:focus-visible { outline: 3px solid var(--color-sky-blue); outline-o
 .no-js .envelope-scene__sticky { position: relative; }
 .no-js .envelope-cover { display: none; }
 .no-js .envelope__flap { z-index: 2; }
+
+/* Vietnamese line breaking (shared/vi-wrap.ts): address parts wrap as whole blocks; even out the lines */
+.keep { display: inline-block; }
+.story, .rsvp-cta__note, .closing-card__note { text-wrap: pretty; }
+.pc-venue, .event__venue, .event__address, .family__address, .env-sheet .pc-address { text-wrap: balance; }
 
 /* ---------- Scroll reveal ---------- */
 .reveal { opacity: 0; transform: translate3d(0, 28px, 0); transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out); }

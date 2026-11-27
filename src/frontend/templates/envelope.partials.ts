@@ -13,6 +13,7 @@ import { blossom, firstPhoto, floralSpray, ornament, picture, variant } from './
 import { lunarLine } from '../../shared/lunar-calendar';
 import { PAGE_DIRS } from '../../shared/routes';
 import { presenceLine } from '../../shared/invitation-formatter';
+import { keepParts, keepWords } from '../../shared/vi-wrap';
 
 /** Envelope flap (triangle pointing down) with a soft highlight along its folded edges. */
 export function flapSvg(cls: string, height = 180, width = 400): string {
@@ -106,8 +107,9 @@ function whenTable(iso: string): string {
       </div>`;
 }
 
-const venueOf = (e: EventDetails) => escapeHtml(e.venueName);
-const addressOf = (e: EventDetails) => escapeHtml([e.hallName, e.address].filter(Boolean).join(' · '));
+const venueOf = (e: EventDetails) => escapeHtml(keepWords(e.venueName));
+/** Hall on its own line above the street address. */
+const addressOf = (e: EventDetails) => [e.hallName, e.address].filter((s): s is string => !!s).map(keepParts).join('<br>');
 
 function parentsBlock(config: WeddingConfig): string {
   const parent = (side: string, p: WeddingConfig['groomParents']) =>
@@ -241,8 +243,8 @@ function scheduleItem(e: EventDetails, mapsUrl: string, withMap: boolean, i: num
             <h3 class="sched-item__title script">${escapeHtml(e.title)}</h3>
             <p class="event__date">${escapeHtml(`${f.weekday}, ${f.date}`)}</p>
             <p class="sched-item__lunar">${escapeHtml(lunarLine(e.datetime))}</p>
-            <p class="event__venue">${venue}${e.hallName ? ` · ${escapeHtml(e.hallName)}` : ''}</p>
-            <p class="event__address">${escapeHtml(e.address)}</p>
+            <p class="event__venue">${[e.venueName, e.hallName].filter((s): s is string => !!s).map(keepParts).join('<br>')}</p>
+            <p class="event__address">${keepParts(e.address)}</p>
             ${map}${withMap ? `<a class="sched-item__link" href="${href}" target="_blank" rel="noopener">Chỉ đường Google Maps <span aria-hidden="true">↗</span></a>` : ''}
           </div>
         </article>`;
@@ -293,7 +295,7 @@ function familyStamp(side: 'groom' | 'bride', p: WeddingConfig['groomParents'], 
             <div class="stamp__art"><span class="stamp__side script">${label}</span></div>
             <span class="family__side">${label}</span>
             <p class="family__parents">${escapeHtml(p.father)}<br>${escapeHtml(p.mother)}</p>
-            <p class="family__address">${escapeHtml(p.address)}</p>
+            <p class="family__address">${keepParts(p.address)}</p>
             <p class="family__child">${side === 'groom' ? 'Chú rể' : 'Cô dâu'} ${escapeHtml(child)}</p>
           </div>
         </article>`;
@@ -326,7 +328,7 @@ export function storySection(config: WeddingConfig, photos: PhotoRecord[], galle
     <div class="container story-wrap" data-parallax-speed="0">
       <span class="eyebrow rise" style="--d:0">Our story</span>
       <h2 class="section-title script story-title rise" style="--d:.05">Chuyện của chúng mình</h2>
-      <p class="story rise" style="--d:.12">${escapeHtml(config.story)}</p>
+      <p class="story rise" style="--d:.12">${escapeHtml(keepWords(config.story))}</p>
     </div>
     <div id="gallery" class="container gallery-wrap">${galleryHtml}</div>
   </section>`;
@@ -368,7 +370,7 @@ function closingCard(config: WeddingConfig): string {
     num ? `<li><a href="tel:${escapeHtml(num.replace(/(?!^\+)\D/g, ''))}">${escapeHtml(num)}</a> <span>(${role})</span></li>` : '';
   const phones = [phone('Chú rể', inv.groomPhone), phone('Cô dâu', inv.bridePhone)].join('');
   return `<span class="eyebrow">${escapeHtml(inv.closingTitle)}</span>
-            <p class="closing-card__note">${escapeHtml(inv.closingNote)}</p>
+            <p class="closing-card__note">${escapeHtml(keepWords(inv.closingNote))}</p>
             ${phones ? `<ul class="closing-card__phones">${phones}</ul>` : ''}`;
 }
 
@@ -378,7 +380,7 @@ export function rsvpCtaSection(config: WeddingConfig, linkAttrs = ''): string {
   const card = `<div class="letter-env__card rsvp-cta__panel">
             <span class="eyebrow">Thiệp hồi âm</span>
             <h2 class="rsvp-cta__title script">${escapeHtml(inv.rsvpTitle)}</h2>
-            <p class="rsvp-cta__note">${escapeHtml(inv.rsvpNote)}</p>
+            <p class="rsvp-cta__note">${escapeHtml(keepWords(inv.rsvpNote))}</p>
             <a class="btn" href="${PAGE_DIRS.rsvp}" ${linkAttrs}>Xác nhận tham dự</a>
           </div>`;
   return `
