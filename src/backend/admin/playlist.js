@@ -59,6 +59,37 @@ function buildUpload() {
   );
 }
 
+function buildYouTube() {
+  const urlInput = h('input', { type: 'url', class: 'input min-w-0 flex-1', placeholder: 'https://www.youtube.com/watch?v=…', 'aria-label': 'Link YouTube' });
+  const status = h('p', { class: 'status', 'aria-live': 'polite' });
+  const add = async () => {
+    const url = urlInput.value.trim();
+    if (!url) return;
+    status.textContent = 'Đang thêm…';
+    try {
+      await api('POST', '/api/playlist/youtube', { url });
+      urlInput.value = '';
+      status.textContent = 'Đã thêm bài YouTube.';
+      await reload();
+    } catch (e) {
+      status.textContent = 'Lỗi: ' + e.message;
+    }
+  };
+  urlInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      void add();
+    }
+  });
+  return h(
+    'div',
+    { class: 'mb-4 flex flex-col gap-2 rounded-xl border border-line bg-white p-4' },
+    h('p', { class: 'hint m-0' }, 'Hoặc dán link YouTube — nhạc được phát bằng trình phát YouTube (không tải về máy chủ).'),
+    h('div', { class: 'flex flex-col gap-2 sm:flex-row' }, urlInput, h('button', { type: 'button', class: 'btn btn-primary min-h-12 text-base', onclick: add }, 'Thêm link')),
+    status,
+  );
+}
+
 function row(t, index) {
   const title = h('input', { type: 'text', class: 'input min-w-0', value: t.title, maxlength: 120, 'aria-label': 'Tên bài hát' });
   const move = (delta) => {
@@ -71,7 +102,14 @@ function row(t, index) {
     'article',
     { class: 'grid gap-2 rounded-xl border border-line bg-white p-3 sm:grid-cols-[auto_1fr_auto] sm:items-center' },
     h('span', { class: 'badge bg-navy/85 text-white' }, `#${index + 1}`),
-    h('div', { class: 'grid min-w-0 gap-1.5' }, title, h('audio', { controls: true, preload: 'none', src: `/site/${t.src}`, class: 'w-full' })),
+    h(
+      'div',
+      { class: 'grid min-w-0 gap-1.5' },
+      title,
+      t.youtubeId
+        ? h('a', { href: t.youtubeUrl, target: '_blank', rel: 'noopener', class: 'hint truncate' }, `▶ YouTube: ${t.youtubeId}`)
+        : h('audio', { controls: true, preload: 'none', src: `/site/${t.src}`, class: 'w-full' }),
+    ),
     h(
       'div',
       { class: 'flex flex-wrap items-center gap-1.5' },
@@ -101,6 +139,6 @@ export async function init() {
   if (!root) return;
   listEl = h('div', { class: 'grid gap-2' });
   flashEl = h('p', { class: 'status mt-2', 'aria-live': 'polite' });
-  root.replaceChildren(buildUpload(), listEl, flashEl);
+  root.replaceChildren(buildUpload(), buildYouTube(), listEl, flashEl);
   await reload();
 }

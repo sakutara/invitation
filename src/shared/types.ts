@@ -199,7 +199,10 @@ export interface InvitationContent {
   rsvpNote: string;
   closingTitle: string;
   closingNote: string;
-  contact: string;
+  /** Groom's phone for the closing card. */
+  groomPhone: string;
+  /** Bride's phone for the closing card. */
+  bridePhone: string;
 }
 
 export interface RsvpFormConfig {
@@ -211,7 +214,7 @@ export interface RsvpFormConfig {
   entryAttendees: string;
 }
 
-export type PhotoPlacement = 'hero' | 'story' | 'gallery' | 'rsvp_background' | 'invite_portrait' | 'static_map';
+export type PhotoPlacement = 'hero' | 'story' | 'gallery' | 'rsvp_background' | 'invite_portrait' | 'calendar' | 'static_map';
 
 export interface ImageVariant {
   tier: ImageTier;
@@ -279,8 +282,12 @@ export interface GuestRecord {
 export interface MusicTrack {
   id: string;
   title: string;
-  /** Path relative to dist/ (e.g. assets/music/track-ab12cd34.mp3) */
+  /** Path relative to dist/ (e.g. assets/music/track-ab12cd34.mp3); '' for YouTube tracks */
   src: string;
+  /** YouTube video id: when set, the track plays through YouTube's embedded player instead of `src`. */
+  youtubeId?: string;
+  /** Link the admin pasted, kept for reference. */
+  youtubeUrl?: string;
   sortOrder: number;
 }
 

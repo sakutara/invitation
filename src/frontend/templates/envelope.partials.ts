@@ -9,7 +9,7 @@ import { formatViDateTime } from '../../shared/date-format';
 import { resolveInvitation } from '../../shared/default-config';
 import { monthGrid, googleCalendarUrl, WEEKDAY_HEADERS_VI } from '../../shared/wedding-calendar';
 import type { EventDetails, MusicTrack, PhotoRecord, WeddingConfig } from '../../shared/types';
-import { blossom, bouquet, firstPhoto, floralSpray, ornament, picture, variant } from './partials';
+import { blossom, firstPhoto, floralSpray, ornament, picture, variant } from './partials';
 import { lunarLine } from '../../shared/lunar-calendar';
 import { PAGE_DIRS } from '../../shared/routes';
 import { presenceLine } from '../../shared/invitation-formatter';
@@ -21,19 +21,24 @@ export function flapSvg(cls: string, height = 180, width = 400): string {
 <path class="flap__edge" d="M0 0 L${width / 2} ${height} L${width} 0"/></svg>`;
 }
 
+/*
+ * The closed envelope filling the screen. Both drawings stretch to any screen (preserveAspectRatio none) and are
+ * mirror-symmetric: the flap's diagonals run from the two side edges to the centre, where the heart seal sits
+ * (65% down), and the lower folds run from the bottom corners up under the flap.
+ */
+const coverFoldsSvg = () =>
+  `<svg class="envelope-cover__folds" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0 100 L50 61 L100 100"/></svg>`;
+
+const coverFlapSvg = () => `<svg class="envelope-cover__flap" viewBox="0 0 100 65" preserveAspectRatio="none" aria-hidden="true">
+<path class="flap__shape" d="M0 0 H100 V38 L50 65 L0 38 Z"/>
+<path class="flap__edge" d="M0 38 L50 65 L100 38"/></svg>`;
+
 /** Front pocket of an open envelope (covers the bottom of what is tucked inside). `v` = depth of the V opening (0..280). */
 export function pocketSvg(cls: string, v = 168): string {
   return `<svg class="${cls}" viewBox="0 0 400 280" preserveAspectRatio="none" aria-hidden="true">
 <path class="pocket__shape" d="M0 0 L200 ${v} L400 0 V280 H0 Z"/>
 <path class="pocket__fold" d="M0 280 L${200 - 22} ${v - 12} M400 280 L${200 + 22} ${v - 12}"/>
 <path class="pocket__edge" d="M0 0 L200 ${v} L400 0"/></svg>`;
-}
-
-/** Cream wax seal with the couple monogram and a small sprig (closed envelope cover). */
-export function waxSeal(monogram: string, cls = ''): string {
-  return `<span class="wax-seal ${cls}" aria-hidden="true"><span class="wax-seal__inner">
-<svg class="wax-seal__sprig" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M20 36 V10"/><path d="M20 18 c-6-2-9-7-8-12 c5 1 8 6 8 12z" fill="currentColor" fill-opacity=".25"/><path d="M20 24 c6-2 9-7 8-12 c-5 1-8 6-8 12z" fill="currentColor" fill-opacity=".25"/></svg>
-<span class="wax-seal__mono">${escapeHtml(monogram)}</span></span></span>`;
 }
 
 const HEART_WAX = 'M50 90C44 85 30 76 19 64C8 52 3 41 5 29C7 16 17 7 30 7C39 7 46 12 50 19C54 12 61 7 70 7C83 7 93 16 95 29C97 41 92 52 81 64C70 76 56 85 50 90Z';
@@ -123,17 +128,16 @@ function letterSheet(config: WeddingConfig, announce: boolean): string {
   const r = config.reception;
   const names = `<p class="pc-names script">${escapeHtml(config.groomName)}<span class="pc-names__amp">&amp;</span>${escapeHtml(config.brideName)}</p>`;
   if (announce) {
-    const c = config.ceremony;
-    const iso = c.datetime || mainIsoOf(config);
+    const iso = r.datetime;
     return `<article class="env-sheet env-sheet--letter env-sheet--announce paper-card paper-card--main" aria-label="Lời báo hỉ">
         <div class="env-sheet__paper">
           ${floralSpray('paper-card__floral paper-card__floral--bl')}
           <p class="pc-caps">${escapeHtml(config.headline)}</p>
           <p class="pc-caps pc-caps--sm">của chúng mình</p>
           ${names}
-          <p class="pc-caps pc-caps--sm">Hôn lễ được cử hành tại</p>
-          <p class="pc-venue">${venueOf(c)}</p>
-          <p class="pc-address">${addressOf(c)}</p>
+          <p class="pc-caps pc-caps--sm">Tiệc cưới được tổ chức tại</p>
+          <p class="pc-venue">${venueOf(r)}</p>
+          <p class="pc-address">${addressOf(r)}</p>
           ${whenTable(iso)}
           <p class="pc-lunar">${escapeHtml(lunarLine(iso))}</p>
           <p class="pc-presence script">${escapeHtml(inv.scriptHeadline)}</p>
@@ -178,7 +182,6 @@ function vinyl(monogram: string, hasMusic: boolean): string {
 export function envelopeScene(config: WeddingConfig, photos: PhotoRecord[], opts: { headingTag?: 'h1' | 'p'; kind?: 'invite' | 'announce'; hasMusic?: boolean } = {}): string {
   const inv = resolveInvitation(config);
   const announce = opts.kind === 'announce';
-  const [dd, mm, yyyy] = formatViDateTime(mainIsoOf(config)).date.split('/');
   const tag = opts.headingTag ?? 'h1';
   const letterPhoto = photoSrc(firstPhoto(photos, 'invite_portrait', 'hero', 'gallery'), 'md');
   const groom = escapeHtml(config.groomName);
@@ -201,37 +204,23 @@ export function envelopeScene(config: WeddingConfig, photos: PhotoRecord[], opts
           </div>
         </article>
         ${letterSheet(config, announce)}
-        ${pocketSvg('env-part envelope__pocket', 112)}
+        ${pocketSvg('env-part envelope__pocket', 174)}
         <div class="env-part envelope__front">
-          <p class="envelope__date"><span>${escapeHtml(dd ?? '')}</span><i aria-hidden="true">·</i><span>${escapeHtml(mm ?? '')}</span><i aria-hidden="true">·</i><span>${escapeHtml(yyyy ?? '')}</span></p>
           ${heartSeal(inv.monogram, 'env', 'envelope__seal')}
         </div>
       </div>
 
       <div class="envelope-cover">
         <div class="envelope-cover__paper"></div>
-        ${flapSvg('envelope-cover__flap envelope-cover__flap--tall', 170)}${flapSvg('envelope-cover__flap envelope-cover__flap--wide', 170, 1100)}
+        ${coverFoldsSvg()}${coverFlapSvg()}
         <div class="envelope-cover__text">
           <span class="envelope-cover__eyebrow">${escapeHtml(inv.coverEyebrow)}</span>
           <${tag} class="envelope-cover__names"><span>${groom}</span><span class="envelope-cover__amp script">&amp;</span><span>${bride}</span></${tag}>
         </div>
-        ${floralSpray('envelope-cover__floral')}
-        <button class="envelope-cover__seal" type="button" data-role="open-envelope" aria-label="Mở thiệp">${waxSeal(inv.monogram)}</button>
+        ${floralSpray('envelope-cover__floral envelope-cover__floral--l')}${floralSpray('envelope-cover__floral envelope-cover__floral--r', '', 'h')}
+        <button class="envelope-cover__seal" type="button" data-role="open-envelope" aria-label="Mở thiệp">${heartSeal(inv.monogram, 'cover')}</button>
         <p class="envelope-cover__hint">${escapeHtml(inv.openHint)}<span aria-hidden="true">⌄</span></p>
       </div>
-    </div>
-  </section>`;
-}
-
-/** Caption under the scene ("Khoảnh khắc ấy đã đến…") with the page's main buttons. */
-export function sceneLead(config: WeddingConfig, actions: string): string {
-  const inv = resolveInvitation(config);
-  return `
-  <section id="hero" class="section scene-lead" data-scroll-progress data-scroll-span="0.8">
-    <div class="container envelope-caption">
-      <p class="envelope-caption__moment rise" style="--d:0">${escapeHtml(inv.momentLine)}</p>
-      <p class="envelope-caption__script script rise" style="--d:.08">${escapeHtml(inv.scriptHeadline)}</p>
-      <div class="hero__actions rise" style="--d:.16">${actions}</div>
     </div>
   </section>`;
 }
@@ -254,73 +243,54 @@ function scheduleItem(e: EventDetails, mapsUrl: string, withMap: boolean, i: num
             <p class="sched-item__lunar">${escapeHtml(lunarLine(e.datetime))}</p>
             <p class="event__venue">${venue}${e.hallName ? ` · ${escapeHtml(e.hallName)}` : ''}</p>
             <p class="event__address">${escapeHtml(e.address)}</p>
-            ${map}<a class="sched-item__link" href="${href}" target="_blank" rel="noopener">Chỉ đường Google Maps <span aria-hidden="true">↗</span></a>
+            ${map}${withMap ? `<a class="sched-item__link" href="${href}" target="_blank" rel="noopener">Chỉ đường Google Maps <span aria-hidden="true">↗</span></a>` : ''}
           </div>
         </article>`;
-}
-
-/** Postmark-style circle naming the party venue. */
-function venueStamp(config: WeddingConfig): string {
-  const r = config.reception;
-  const [dd, mm, yyyy] = formatViDateTime(r.datetime || mainIsoOf(config)).date.split('/');
-  const city = resolveInvitation(config).place;
-  return `<div class="venue-stamp rise" style="--d:0">
-          <svg class="venue-stamp__ring" viewBox="0 0 200 200" aria-hidden="true">
-            <defs><path id="vs-top" d="M34 100a66 66 0 0 1 132 0"/><path id="vs-bot" d="M26 100a74 74 0 0 0 148 0"/></defs>
-            <circle cx="100" cy="100" r="96"/><circle cx="100" cy="100" r="88" class="venue-stamp__dash"/><circle cx="100" cy="100" r="58"/>
-            <text><textPath href="#vs-top" startOffset="50%" text-anchor="middle">Địa điểm tiệc cưới</textPath></text>
-            <text><textPath href="#vs-bot" startOffset="50%" text-anchor="middle">${escapeHtml([dd, mm, yyyy].filter(Boolean).join(' · '))}${city ? ` ✦ ${escapeHtml(city)}` : ''}</textPath></text>
-          </svg>
-          <p class="venue-stamp__inner"><span class="venue-stamp__name">${venueOf(r)}</span>${r.hallName ? `<span class="venue-stamp__hall">${escapeHtml(r.hallName)}</span>` : ''}</p>
-        </div>`;
 }
 
 /**
  * "Lịch trình" section: venue stamp and the two stops of the day beside the heart calendar, with a bouquet,
  * a tilted photo print and a blossom around them. `withMaps` adds the map previews (invitation only).
  */
-export function scheduleSection(config: WeddingConfig, photos: PhotoRecord[], opts: { root?: string; withMaps?: boolean; id?: string } = {}): string {
-  const root = opts.root ?? '';
+export function scheduleSection(config: WeddingConfig, photos: PhotoRecord[], opts: { withMaps?: boolean; id?: string } = {}): string {
   const inv = resolveInvitation(config);
   const mainIso = mainIsoOf(config);
   const wedding = formatViDateTime(mainIso);
-  const yyyy = wedding.date.split('/')[2];
   const gcal = googleCalendarUrl(config, config.reception);
   const events = [config.ceremony, config.reception].filter((e) => e.datetime);
-  const print = photoSrc(firstPhoto(photos, 'story', 'gallery', 'hero'), 'sm');
+  const print = photoSrc(firstPhoto(photos, 'calendar', 'gallery', 'hero'), 'sm');
   return `
   <section id="${opts.id ?? 'schedule'}" class="section schedule-section" data-scroll-progress data-scroll-span="1.1">
     ${ornament('tl')}
     <div class="container schedule">
-      <div class="schedule__venue">${venueStamp(config)}</div>
       <div class="schedule__list">
         <span class="eyebrow rise" style="--d:.04">Lịch trình</span>
         <h2 class="section-title rise" style="--d:.08">Ngày vui của chúng mình</h2>
         <div class="events">${events.map((e, i) => scheduleItem(e, config.googleMapsUrl, !!opts.withMaps, i)).join('')}</div>
       </div>
-      <div class="schedule__bouquet">${bouquet('schedule__bouquet-svg')}</div>
-      <div id="calendar" class="schedule__calendar" data-scroll-progress data-scroll-span="0.85">
-        ${calendarBlock(mainIso, inv.calendarTitle, wedding.weekday)}
-        <div class="calendar__actions">
-          <a class="btn" href="${root}assets/data/wedding.ics" download="dam-cuoi-${escapeHtml(yyyy ?? '')}.ics" data-role="add-calendar">Thêm vào lịch</a>
-          ${gcal ? `<a class="btn btn--ghost btn--ink" href="${escapeHtml(gcal)}" target="_blank" rel="noopener">Google Calendar</a>` : ''}
+      <div class="schedule__combo">
+        <div id="calendar" class="schedule__calendar" data-scroll-progress data-scroll-span="0.85">
+          ${calendarBlock(mainIso, inv.calendarTitle, wedding.weekday)}
+          <div class="calendar__actions">
+            ${gcal ? `<a class="btn btn--ghost btn--ink" href="${escapeHtml(gcal)}" target="_blank" rel="noopener">Google Calendar</a>` : ''}
+          </div>
         </div>
-        ${blossom('schedule__blossom', 'blue')}
+        <figure class="schedule__photo photo-print${print ? '' : ' photo-print--empty'}">
+          <span class="photo-print__tape photo-print__tape--l" aria-hidden="true"></span>
+          <div class="photo-print__frame">${print ? `<img src="${escapeHtml(print.src)}" alt="" width="${print.width}" height="${print.height}" loading="lazy" decoding="async"${print.style}>` : `<span class="letter-card__fallback script">${escapeHtml(inv.monogram)}</span>`}</div>
+        </figure>
+        ${floralSpray('schedule__flower')}
       </div>
-      <figure class="schedule__photo photo-print${print ? '' : ' photo-print--empty'}">
-        <span class="photo-print__tape photo-print__tape--l" aria-hidden="true"></span>
-        <div class="photo-print__frame">${print ? `<img src="${escapeHtml(print.src)}" alt="" width="${print.width}" height="${print.height}" loading="lazy" decoding="async"${print.style}>` : `<span class="letter-card__fallback script">${escapeHtml(inv.monogram)}</span>`}</div>
-      </figure>
     </div>
   </section>`;
 }
 
 /** Postage-stamp card of one family side. */
-function familyStamp(side: 'groom' | 'bride', p: WeddingConfig['groomParents'], child: string, value: string): string {
+function familyStamp(side: 'groom' | 'bride', p: WeddingConfig['groomParents'], child: string): string {
   const label = side === 'groom' ? 'Nhà Trai' : 'Nhà Gái';
   return `<article class="stamp stamp--${side} family family--${side}">
           <div class="stamp__paper">
-            <div class="stamp__art"><span class="stamp__side script">${label}</span><span class="stamp__value">${escapeHtml(value)}</span></div>
+            <div class="stamp__art"><span class="stamp__side script">${label}</span></div>
             <span class="family__side">${label}</span>
             <p class="family__parents">${escapeHtml(p.father)}<br>${escapeHtml(p.mother)}</p>
             <p class="family__address">${escapeHtml(p.address)}</p>
@@ -331,18 +301,16 @@ function familyStamp(side: 'groom' | 'bride', p: WeddingConfig['groomParents'], 
 
 /** Nhà trai / nhà gái as two postage stamps, set off from each other, with blossoms (announcement page). */
 export function familiesSection(config: WeddingConfig): string {
-  const [dd, mm] = formatViDateTime(mainIsoOf(config)).date.split('/');
-  const value = [dd, mm].filter(Boolean).join('.');
   return `
   <section id="family" class="section family-section" data-scroll-progress data-scroll-span="1.2">
     <div class="container">
       <span class="eyebrow rise" style="--d:0">Nhà trai · Nhà gái</span>
       <h2 class="section-title rise" style="--d:.05">Hai bên gia đình</h2>
       <div class="families">
-        ${familyStamp('groom', config.groomParents, config.groomName, value)}
+        ${familyStamp('groom', config.groomParents, config.groomName)}
         ${blossom('families__blossom families__blossom--a', 'blue')}
         ${blossom('families__blossom families__blossom--b', 'wine')}
-        ${familyStamp('bride', config.brideParents, config.brideName, value)}
+        ${familyStamp('bride', config.brideParents, config.brideName)}
       </div>
     </div>
   </section>`;
@@ -364,14 +332,12 @@ export function storySection(config: WeddingConfig, photos: PhotoRecord[], galle
   </section>`;
 }
 
-/** Countdown on a hanging tag over a slow photo. */
-export function countdownSection(config: WeddingConfig, photos: PhotoRecord[]): string {
+/** Countdown on a hanging tag, on the plain page paper. */
+export function countdownSection(config: WeddingConfig): string {
   const inv = resolveInvitation(config);
-  const moodPhoto = firstPhoto(photos, 'story', 'gallery', 'hero');
   const firstIso = [config.ceremony.datetime, config.reception.datetime].filter(Boolean).sort()[0] ?? mainIsoOf(config);
   return `
-  <section id="countdown" class="section parallax countdown-section" data-scroll-progress data-scroll-span="1">
-      <div class="parallax__layer${moodPhoto ? '' : ' hero__fallback-bg'}" data-parallax-speed="0.25">${moodPhoto ? picture(moodPhoto, { sizes: '100vw', alt: '', fallbackTier: 'md' }) : ''}</div>
+  <section id="countdown" class="section countdown-section" data-scroll-progress data-scroll-span="1">
       <div class="hang-tag countdown" data-role="countdown" data-target="${escapeHtml(firstIso)}">
         <span class="hang-tag__hole" aria-hidden="true"></span>
         <div class="countdown__grid" role="timer" aria-live="off">
@@ -397,9 +363,13 @@ function letterEnvelope(card: string, monogram: string, key: string): string {
 
 function closingCard(config: WeddingConfig): string {
   const inv = resolveInvitation(config);
+  /** One line per spouse: "<tel link> (Chú rể)"; the link keeps digits and a leading + only. */
+  const phone = (role: string, num: string) =>
+    num ? `<li><a href="tel:${escapeHtml(num.replace(/(?!^\+)\D/g, ''))}">${escapeHtml(num)}</a> <span>(${role})</span></li>` : '';
+  const phones = [phone('Chú rể', inv.groomPhone), phone('Cô dâu', inv.bridePhone)].join('');
   return `<span class="eyebrow">${escapeHtml(inv.closingTitle)}</span>
             <p class="closing-card__note">${escapeHtml(inv.closingNote)}</p>
-            ${inv.contact ? `<p class="closing-card__contact">${escapeHtml(inv.contact)}</p>` : ''}`;
+            ${phones ? `<ul class="closing-card__phones">${phones}</ul>` : ''}`;
 }
 
 /** "Hồi âm": the reply card in its envelope, with the closing note under it (announcement page). */
@@ -434,7 +404,9 @@ export function closingSection(config: WeddingConfig): string {
 
 /** Background music: the playlist for scripts/music.ts and a floating record button. */
 export function musicPlayer(playlist: MusicTrack[] | undefined, root = ''): string {
-  const tracks = (playlist ?? []).map((t) => ({ title: t.title, src: root + t.src }));
+  const tracks = (playlist ?? []).map((t) =>
+    t.youtubeId ? { title: t.title, src: '', youtubeId: t.youtubeId } : { title: t.title, src: root + t.src },
+  );
   if (!tracks.length) return '';
   return `<script type="application/json" id="music-data">${JSON.stringify(tracks).replace(/</g, '\\u003c')}</script>
 <button class="music-fab" type="button" data-role="music-toggle" aria-label="Bật / tắt nhạc" aria-pressed="false"><span class="music-fab__disc" aria-hidden="true"></span><span class="music-fab__note" aria-hidden="true">♪</span></button>`;

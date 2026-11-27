@@ -1,6 +1,7 @@
 /** Compiles the SQLite snapshot into the deployable static site under dist/. */
 import { mkdir, writeFile, readFile, readdir, rm, cp, stat, rename } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import type { Buffer } from 'node:buffer';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as esbuild from 'esbuild';
@@ -41,7 +42,7 @@ export type PublicWeddingData = Omit<WeddingData, 'guests'> & { builtAt: string 
 
 let tmpCounter = 0;
 /** Write via temp file + rename so readers (preview server, deploy sync) never observe a partial file. */
-async function writeAtomic(path: string, content: string): Promise<void> {
+async function writeAtomic(path: string, content: string | Buffer): Promise<void> {
   const tmp = `${path}.${process.pid}.${++tmpCounter}.tmp`;
   await writeFile(tmp, content);
   await rename(tmp, path);
@@ -101,7 +102,7 @@ export class StaticBuilder {
   async build(data: WeddingData): Promise<BuildReport> {
     const t0 = performance.now();
     const dist = this.distDir;
-    await Promise.all(['assets/data', 'assets/css', 'assets/js', 'assets/images', ...Object.values(PAGE_DIRS)].map((d) => mkdir(join(dist, d), { recursive: true })));
+    await Promise.all(['assets/data', 'assets/css', 'assets/js', 'assets/img', 'assets/images', ...Object.values(PAGE_DIRS)].map((d) => mkdir(join(dist, d), { recursive: true })));
 
     const publicData: PublicWeddingData = {
       config: data.config,
@@ -111,7 +112,7 @@ export class StaticBuilder {
       seatingLayout: data.seatingLayout ?? null,
       builtAt: new Date().toISOString(),
     };
-    const files: Record<string, string> = {
+    const files: Record<string, string | Buffer> = {
       'index.html': renderIndexPage(publicData),
       [`${PAGE_DIRS.rsvp}index.html`]: renderRsvpPage(publicData),
       [`${PAGE_DIRS.invite}index.html`]: renderInvitePage(publicData),
@@ -124,6 +125,13 @@ export class StaticBuilder {
     const css = join(FRONTEND, 'styles/main.css');
     if (existsSync(css)) files['assets/css/main.css'] = await readFile(css, 'utf8');
     for (const [name, code] of await bundleScripts()) files[`assets/js/${name}`] = code;
+
+    const imgDir = join(FRONTEND, 'images');
+    if (existsSync(imgDir)) {
+      for (const e of await readdir(imgDir, { withFileTypes: true })) {
+        if (e.isFile()) files[`assets/img/${e.name}`] = await readFile(join(imgDir, e.name));
+      }
+    }
 
     await Promise.all(Object.entries(files).map(([rel, content]) => writeAtomic(join(dist, rel), content)));
     await this.syncImages(data);
@@ -152,7 +160,7 @@ export class StaticBuilder {
     const src = join(this.mediaDir, '_music');
     const dest = join(this.distDir, 'assets/music');
     await mkdir(dest, { recursive: true });
-    const wanted = new Set((data.playlist ?? []).map((t) => t.src.split('/').pop()!));
+    const wanted = new Set((data.playlist ?? []).filter((t) => t.src).map((t) => t.src.split('/').pop()!));
     for (const e of await readdir(dest, { withFileTypes: true })) {
       if (!wanted.has(e.name)) await rm(join(dest, e.name), { recursive: true, force: true });
     }
