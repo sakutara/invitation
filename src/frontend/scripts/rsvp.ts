@@ -1,4 +1,5 @@
 /** RSVP form: validation, unique-phone webhook submission (text/plain, CORS-safe), thank-you view, auto-return. */
+import { playSendAnimation } from './rsvp-send';
 import { isValidVnPhone, normalizeVnPhone } from '../../shared/phone-normalizer';
 import { resolveRelationship } from '../../shared/guest-codec';
 import { RELATIONSHIP_GROUPS, type RsvpFormConfig, type RsvpSubmission } from '../../shared/types';
@@ -69,6 +70,8 @@ export interface RsvpPageOptions {
   fetchImpl?: FetchLike;
   navigate?: (url: string) => void;
   redirectDelayMs?: number;
+  /** Plays between a successful submit and the thank-you card. */
+  animateSend?: (doc: Document) => Promise<void>;
 }
 
 export function initRsvpPage(doc: Document = document, opts: RsvpPageOptions = {}): void {
@@ -110,6 +113,7 @@ export function initRsvpPage(doc: Document = document, opts: RsvpPageOptions = {
       const { operation } = gform
         ? await submitGoogleForm(gform, result.submission, opts.fetchImpl)
         : await submitRsvp(form.dataset.webhook ?? '', result.submission, opts.fetchImpl);
+      await (opts.animateSend ?? playSendAnimation)(doc).catch(() => {}); // never block the thank-you
       form.hidden = true;
       thanks.hidden = false;
       thanks.querySelector('.rsvp__thanks-text')!.textContent =

@@ -14,14 +14,14 @@ import { presenceLine } from '../../shared/invitation-formatter';
 import type { EventDetails } from '../../shared/types';
 
 /** Envelope flap (triangle pointing down) with a soft highlight along its folded edges. */
-function flapSvg(cls: string, height = 180, width = 400): string {
+export function flapSvg(cls: string, height = 180, width = 400): string {
   return `<svg class="${cls}" viewBox="0 0 ${width} ${height + 4}" preserveAspectRatio="none" aria-hidden="true">
 <path class="flap__shape" d="M0 0 H${width} L${width / 2} ${height} Z"/>
 <path class="flap__edge" d="M0 0 L${width / 2} ${height} L${width} 0"/></svg>`;
 }
 
 /** Front pocket of an open envelope (covers the bottom of what is tucked inside). */
-function pocketSvg(cls: string): string {
+export function pocketSvg(cls: string): string {
   return `<svg class="${cls}" viewBox="0 0 400 280" preserveAspectRatio="none" aria-hidden="true">
 <path class="pocket__shape" d="M0 0 L200 168 L400 0 V280 H0 Z"/>
 <path class="pocket__fold" d="M0 280 L178 156 M400 280 L222 156"/>

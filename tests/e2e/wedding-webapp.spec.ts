@@ -105,6 +105,38 @@ test.describe('RSVP page (rsvp.html)', () => {
     await page.waitForURL(/\/index\.html$/, { timeout: 10_000 });
   });
 
+  test('keeps the envelope flap hinged on the envelope while the reply card is sent', async ({ page }) => {
+    await page.route(fixture().webhook, (r) => r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ ok: true }) }));
+    await page.goto('rsvp.html');
+    await page.getByLabel('Họ và tên').fill('Nguyễn Văn An');
+    await page.getByLabel('Số điện thoại').fill('0905123456');
+    await page.getByLabel('Bạn là').selectOption('groom_friends');
+    // the envelope keeps its resting size for the whole animation (never stretched)
+    const size = () => page.locator('.rsvp-env__back').evaluate((el) => { const r = el.getBoundingClientRect(); return [r.width, r.height]; });
+    const resting = await size();
+    expect(resting[1] / resting[0]).toBeCloseTo(0.62, 2);
+    await page.getByRole('button', { name: 'Gửi xác nhận' }).click();
+    // sample every frame of phases 1-2: the open flap's lower edge must sit on the envelope's top edge
+    const gaps = await page.evaluate(async ([w0, h0]) => {
+      const stage = document.querySelector('.rsvp__stage')!;
+      while (!stage.classList.contains('is-sending')) await new Promise(requestAnimationFrame);
+      const out: number[] = [];
+      const start = performance.now();
+      while (performance.now() - start < 1100) {
+        await new Promise(requestAnimationFrame);
+        const flap = stage.querySelector('.rsvp-env__flap')!.getBoundingClientRect();
+        const back = stage.querySelector('.rsvp-env__back')!.getBoundingClientRect();
+        const pocket = stage.querySelector('.rsvp-env__pocket')!.getBoundingClientRect();
+        out.push(Math.abs(flap.bottom - back.top), Math.abs(flap.width - back.width), Math.abs(back.width - w0), Math.abs(back.height - h0), Math.abs(pocket.height - h0));
+      }
+      return out;
+    }, resting);
+    expect(gaps.length).toBeGreaterThan(10);
+    expect(Math.max(...gaps)).toBeLessThanOrEqual(2);
+    await expect(page.locator('.rsvp__thanks')).toBeVisible();
+    await expect(page.locator('.rsvp-env__pocket')).toBeHidden();
+  });
+
   test('blocks invalid input client-side', async ({ page }) => {
     let called = false;
     await page.route(fixture().webhook, (r) => { called = true; return r.abort(); });

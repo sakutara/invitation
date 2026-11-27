@@ -2,6 +2,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderRsvpPage } from '../../src/frontend/templates/rsvp.template';
 import { validateRsvp, submitRsvp, submitGoogleForm, initRsvpPage } from '../../src/frontend/scripts/rsvp';
+import { sendLayout, playSendAnimation } from '../../src/frontend/scripts/rsvp-send';
 import { DEFAULT_CONFIG } from '../../src/shared/default-config';
 import { RELATIONSHIP_GROUPS, RELATIONSHIP_KEYS, SEATING_ZONES } from '../../src/shared/types';
 
@@ -154,5 +155,46 @@ describe('submitGoogleForm', () => {
     expect(body.get('entry.50183105')).toBe('0905123456');
     expect(body.get('entry.1545696181')).toBe('Bạn bè');
     expect(body.get('entry.261159171')).toBe('2');
+  });
+});
+
+describe('send animation', () => {
+  beforeEach(mount);
+
+  it('sits the reply card in an envelope', () => {
+    expect(document.querySelector('.rsvp__stage > .rsvp-env__back')).not.toBeNull();
+    expect(document.querySelector('.rsvp__stage > .rsvp-env__pocket svg')).not.toBeNull();
+    expect(document.querySelector('.rsvp__stage > .rsvp-env__flap svg')).not.toBeNull();
+  });
+
+  it.each([[370, 600, 520], [296, 540, 480], [720, 340, 300]])('lays the card sideways, sized to the envelope, in a %ix%i stage', (width, height, cardH) => {
+    const envW = Math.min(width, height * 0.7);
+    const env = { top: cardH - 40, width: envW, height: envW * 0.62 };
+    const l = sendLayout({ height }, { top: 0, width, height: cardH }, env);
+    expect(l).not.toHaveProperty('env'); // the envelope is moved, never resized
+    expect(env.top + l.envY + env.height).toBeLessThanOrEqual(height + 0.01); // ends up fully on stage
+    const [w, h] = l.rotate ? [cardH, width] : [width, cardH];
+    expect(w).toBeGreaterThanOrEqual(h); // lying sideways
+    expect(w * l.scale).toBeLessThanOrEqual(env.width * 0.9 + 0.01); // fits inside...
+    expect(h * l.scale).toBeLessThanOrEqual(env.height * 0.86 + 0.01);
+    expect(Math.max((w * l.scale) / env.width, (h * l.scale) / env.height)).toBeGreaterThan(0.85); // ...and fills it
+    expect(l.insideY).toBeGreaterThan(l.hoverY); // it moves down into the envelope
+  });
+
+  it('resolves at once without Web Animations', async () => {
+    await expect(playSendAnimation(document)).resolves.toBeUndefined();
+    expect(document.querySelector('.rsvp__stage')!.classList.contains('is-sending')).toBe(false);
+  });
+
+  it('shows the thank-you card only after the envelope has flown away', async () => {
+    let release!: () => void;
+    const animateSend = vi.fn(() => new Promise<void>((r) => { release = r; }));
+    initRsvpPage(document, { fetchImpl: async () => new Response(JSON.stringify({ ok: true })), navigate: () => {}, animateSend });
+    fill({ fullName: 'Nguyễn Văn An', phone: '0905123456', relationship: 'groom_friends', attendees: '1' });
+    submit();
+    await vi.waitFor(() => expect(animateSend).toHaveBeenCalled());
+    expect($<HTMLElement>('.rsvp__thanks').hidden).toBe(true);
+    release();
+    await vi.waitFor(() => expect($<HTMLElement>('.rsvp__thanks').hidden).toBe(false));
   });
 });
