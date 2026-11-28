@@ -275,11 +275,9 @@
   ],
   "playlist": [
     {
-      "id": "track-bd4734d5",
-      "title": "If you Love Me for Me- Barbie as the Princess and the Pauper w/ Lyrics",
-      "src": "",
-      "youtubeId": "DBoaOnj6Ll4",
-      "youtubeUrl": "https://www.youtube.com/watch?v=DBoaOnj6Ll4",
+      "id": "track-984d468f",
+      "title": "If you Love Me for Me- Barbie as the Princess and the Pauper w Lyrics",
+      "src": "assets/music/track-984d468f.mp3",
       "sortOrder": 0
     }
   ],
@@ -633,5 +631,5 @@
       }
     ]
   },
-  "builtAt": "2026-11-27T17:41:05.137Z"
+  "builtAt": "2026-11-28T10:32:16.982Z"
 }
